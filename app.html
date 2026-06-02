@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IMPERA AUTOMATION — Silence Remover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600&family=Playfair+Display:wght@500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0d0d0b;
+    --surface-1: #141410;
+    --surface-2: #1a1a14;
+    --gold: #b8952a;
+    --gold-hi: #d4a832;
+    --grid: #1e1e18;
+    --grid-alpha: 0.55;
+    --text-1: #f0ead6;
+    --text-2: #6b6550;
+    --danger: #8b3a2a;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-mono: 'DM Mono', ui-monospace, monospace;
+    --wave-bar: 2px;
+    --wave-gap: 2px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    opacity: var(--grid-alpha);
+    mask-image: radial-gradient(ellipse 120% 90% at 50% 30%, #000 35%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 30%, #000 35%, transparent 100%);
+  }
+
+  #root { position: relative; z-index: 1; }
+
+  ::selection { background: rgba(184,149,42,0.3); color: var(--text-1); }
+
+  *::-webkit-scrollbar { width: 9px; height: 9px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb { background: #2a2a20; }
+  *::-webkit-scrollbar-thumb:hover { background: #3a3a2c; }
+
+  .mono { font-family: var(--font-mono); }
+  .display { font-family: var(--font-display); }
+
+  .caps {
+    text-transform: uppercase;
+    letter-spacing: 0.42em;
+    font-weight: 500;
+  }
+
+  input.impera-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2px;
+    outline: none;
+    cursor: pointer;
+    margin: 0;
+  }
+  input.impera-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 2px;
+    height: 22px;
+    background: var(--gold-hi);
+    border: none;
+    box-shadow: 0 0 0 1px var(--bg), 0 0 10px rgba(212,168,50,0.5);
+    cursor: pointer;
+  }
+  input.impera-range::-moz-range-thumb {
+    width: 2px;
+    height: 22px;
+    background: var(--gold-hi);
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 0 0 1px var(--bg), 0 0 10px rgba(212,168,50,0.5);
+    cursor: pointer;
+  }
+  input.impera-range::-moz-range-track { background: transparent; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- components.jsx -->
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo } = React;
+
+function LogoMark({ size = 30 }) {
+  const id = useMemo(() => 'hatch' + Math.random().toString(36).slice(2, 7), []);
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
+      <defs>
+        <pattern id={id} width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="3.4" stroke="var(--gold)" strokeWidth="0.7" />
+        </pattern>
+        <clipPath id={id + 'clip'}>
+          <path d="M3 6 L37 6 L20 36 Z" />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id}clip)`}>
+        <rect x="0" y="0" width="40" height="40" fill={`url(#${id})`} opacity="0.85" />
+      </g>
+      <path d="M3 6 L37 6 L20 36 Z" stroke="var(--gold)" strokeWidth="1.1" fill="none" />
+    </svg>
+  );
+}
+
+const TOTAL_SEC = 278;
+function fmt(sec, withMs) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  const base = `${m}:${String(s).padStart(2, '0')}`;
+  if (!withMs) return base;
+  const ms = Math.round((sec - Math.floor(sec)) * 1000);
+  return `${base}.${String(ms).padStart(3, '0')}`;
+}
+
+const SILENCE = [
+  [0.066, 0.094],
+  [0.205, 0.252],
+  [0.331, 0.352],
+  [0.468, 0.529],
+  [0.611, 0.640],
+  [0.742, 0.788],
+  [0.886, 0.918],
+];
+
+function mulberry(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function inSilence(frac) {
+  for (let i = 0; i < SILENCE.length; i++) {
+    if (frac >= SILENCE[i][0] && frac <= SILENCE[i][1]) return i;
+  }
+  return -1;
+}
+
+function buildBars(count) {
+  const rnd = mulberry(20260602);
+  const bars = [];
+  let env = 0.4;
+  for (let i = 0; i < count; i++) {
+    const frac = i / (count - 1);
+    const seg = inSilence(frac);
+    if (seg >= 0) {
+      bars.push({ amp: 0.02 + rnd() * 0.03, seg });
+      env = 0.3 + rnd() * 0.2;
+      continue;
+    }
+    env += (rnd() - 0.5) * 0.28;
+    env = Math.max(0.28, Math.min(0.96, env));
+    const detail = 0.45 + rnd() * 0.55;
+    let amp = env * detail;
+    if (rnd() > 0.93) amp = Math.min(1, amp * 1.35);
+    bars.push({ amp: Math.max(0.05, amp), seg: -1 });
+  }
+  return bars;
+}
+
+function buildSegments(padMs) {
+  return SILENCE.map(([a, b], i) => {
+    const start = a * TOTAL_SEC;
+    const end = b * TOTAL_SEC;
+    return { i, start, end, dur: end - start, label: `${String(i + 1).padStart(2, '0')}` };
+  });
+}
+
+Object.assign(window, { LogoMark, fmt, buildBars, buildSegments, SILENCE, inSilence, TOTAL_SEC });
+</script>
+
+<!-- zones.jsx -->
+<script type="text/babel">
+const { useState: useS, useEffect: useE, useRef: useR, useMemo: useM } = React;
+
+function Header() {
+  return (
+    <header style={hz.bar}>
+      <div style={hz.brand}>
+        <LogoMark size={32} />
+        <span className="caps display" style={hz.word}>Impera&nbsp;Automation</span>
+      </div>
+      <div style={hz.toolWrap}>
+        <span style={hz.toolDot} />
+        <span className="mono" style={hz.tool}>SILENCE&nbsp;REMOVER</span>
+      </div>
+    </header>
+  );
+}
+const hz = {
+  bar: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '26px 48px', borderBottom: '1px solid rgba(184,149,42,0.5)',
+    background: 'linear-gradient(to bottom, rgba(184,149,42,0.04), transparent)',
+  },
+  brand: { display: 'flex', alignItems: 'center', gap: '18px' },
+  word: { fontSize: '22px', color: 'var(--text-1)', lineHeight: 1, paddingTop: '2px' },
+  toolWrap: { display: 'flex', alignItems: 'center', gap: '12px' },
+  toolDot: { width: '5px', height: '5px', background: 'var(--gold)', transform: 'rotate(45deg)' },
+  tool: { fontSize: '12px', letterSpacing: '0.3em', color: 'var(--text-2)', fontWeight: 400 },
+};
+
+function UploadZone({ onLoad }) {
+  const [drag, setDrag] = useS(false);
+  const inputRef = useR(null);
+
+  function handleFiles(files) {
+    if (files && files.length > 0) onLoad(files[0].name);
+  }
+
+  return (
+    <div style={uz.outer}>
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".mp3,.wav,.flac,.m4a,audio/*"
+        style={{ display: 'none' }}
+        onChange={(e) => handleFiles(e.target.files)}
+      />
+      <div
+        onClick={() => inputRef.current.click()}
+        onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDrag(false);
+          handleFiles(e.dataTransfer.files);
+        }}
+        style={{
+          ...uz.drop,
+          borderColor: drag ? 'var(--gold-hi)' : 'var(--gold)',
+          background: drag ? 'rgba(184,149,42,0.05)' : 'transparent',
+        }}
+      >
+        <div style={{ ...uz.tri, borderTopColor: drag ? 'var(--gold-hi)' : 'var(--gold)' }} />
+        <div className="display caps" style={uz.headline}>Audio-Datei&nbsp;ablegen</div>
+        <div className="mono" style={uz.sub}>oder klicken zum Auswählen</div>
+        <div className="mono" style={uz.hint}>WAV · MP3 · FLAC · M4A — bis 2 GB</div>
+      </div>
+    </div>
+  );
+}
+const uz = {
+  outer: { padding: '64px 48px 80px' },
+  drop: {
+    maxWidth: '900px', margin: '0 auto', height: '340px',
+    border: '1px dashed var(--gold)', display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer',
+    transition: 'all 0.25s ease', position: 'relative',
+  },
+  tri: {
+    width: 0, height: 0, borderLeft: '22px solid transparent', borderRight: '22px solid transparent',
+    borderTop: '34px solid var(--gold)', marginBottom: '26px', transition: 'border-top-color 0.25s ease',
+  },
+  headline: { fontSize: '30px', letterSpacing: '0.32em', color: 'var(--text-1)' },
+  sub: { fontSize: '13px', letterSpacing: '0.18em', color: 'var(--text-2)', marginTop: '6px' },
+  hint: { fontSize: '11px', letterSpacing: '0.22em', color: 'var(--text-2)', marginTop: '22px', opacity: 0.7 },
+};
+
+function FileStrip({ name, onEject }) {
+  return (
+    <div style={uz.strip}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
+        <div style={uz.smallTri} />
+        <span className="mono" style={uz.fname}>{name}</span>
+        <span className="mono" style={uz.fmeta}>· {fmt(TOTAL_SEC)} · 44.1 kHz · Stereo</span>
+      </div>
+      <button className="mono" style={uz.eject} onClick={onEject}
+        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}>
+        DATEI&nbsp;WECHSELN
+      </button>
+    </div>
+  );
+}
+uz.strip = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  padding: '16px 24px', background: 'var(--surface-1)', border: '1px solid #211f18',
+  marginBottom: '20px',
+};
+uz.smallTri = { width: 0, height: 0, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '11px solid var(--gold)' };
+uz.fname = { fontSize: '14px', letterSpacing: '0.04em', color: 'var(--text-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
+uz.fmeta = { fontSize: '12px', letterSpacing: '0.06em', color: 'var(--text-2)', whiteSpace: 'nowrap' };
+uz.eject = {
+  background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)',
+  fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em',
+  padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0,
+};
+
+Object.assign(window, { Header, UploadZone, FileStrip });
+</script>
+
+<!-- waveform.jsx -->
+<script type="text/babel">
+const { useState: useWS, useRef: useWR, useMemo: useWM } = React;
+
+function Waveform({ barCount, playhead, setPlayhead, segments, activeSeg, onSeekSeg }) {
+  const bars = useWM(() => buildBars(barCount), [barCount]);
+  const ref = useWR(null);
+
+  function seek(e) {
+    const r = ref.current.getBoundingClientRect();
+    const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    setPlayhead(f);
+  }
+
+  const ticks = [];
+  const step = 30;
+  for (let t = 0; t <= TOTAL_SEC; t += step) ticks.push(t);
+
+  return (
+    <div style={wv.panel}>
+      <div style={wv.head}>
+        <span className="mono" style={wv.headLabel}>WELLENFORM</span>
+        <span className="mono" style={wv.headMeta}>
+          <span style={{ color: 'var(--text-1)' }}>{fmt(playhead * TOTAL_SEC, true)}</span>
+          <span style={{ opacity: 0.5 }}> / {fmt(TOTAL_SEC, true)}</span>
+        </span>
+      </div>
+
+      <div ref={ref} style={wv.canvas} onClick={seek}>
+        {segments.map((s) => (
+          <div
+            key={s.i}
+            onClick={(e) => { e.stopPropagation(); onSeekSeg(s.i); }}
+            title={`Stille ${s.label}`}
+            style={{
+              position: 'absolute', top: 0, bottom: 0,
+              left: `${(s.start / TOTAL_SEC) * 100}%`,
+              width: `${(s.dur / TOTAL_SEC) * 100}%`,
+              background: activeSeg === s.i ? 'rgba(139,58,42,0.42)' : 'rgba(139,58,42,0.24)',
+              borderLeft: '1px solid rgba(184,149,42,0.6)',
+              borderRight: '1px solid rgba(184,149,42,0.6)',
+              cursor: 'pointer', zIndex: 2, transition: 'background 0.18s ease',
+            }}
+          />
+        ))}
+
+        <div style={wv.bars}>
+          {bars.map((b, i) => (
+            <div key={i} style={{
+              flex: '1 1 0', minWidth: '1px',
+              height: `${b.amp * 100}%`,
+              background: b.seg >= 0 ? 'rgba(240,234,214,0.18)' : 'var(--text-1)',
+              opacity: b.seg >= 0 ? 1 : 0.82,
+            }} />
+          ))}
+        </div>
+
+        <div style={{ ...wv.playhead, left: `${playhead * 100}%` }}>
+          <div style={wv.playKnob} />
+        </div>
+      </div>
+
+      <div style={wv.ruler}>
+        {ticks.map((t) => (
+          <div key={t} style={{ position: 'absolute', left: `${(t / TOTAL_SEC) * 100}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+            <div style={{ width: '1px', height: '6px', background: '#2c2a20' }} />
+            <span className="mono" style={wv.tickLabel}>{fmt(t)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+const wv = {
+  panel: { background: 'var(--surface-1)', border: '1px solid #211f18', padding: '0' },
+  head: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px 14px', borderBottom: '1px solid #1c1a14' },
+  headLabel: { fontSize: '11px', letterSpacing: '0.28em', color: 'var(--text-2)' },
+  headMeta: { fontSize: '13px', letterSpacing: '0.08em' },
+  canvas: { position: 'relative', height: '240px', margin: '0', padding: '28px 24px', cursor: 'crosshair', overflow: 'hidden' },
+  bars: { position: 'absolute', inset: '28px 24px', display: 'flex', alignItems: 'center', gap: 'var(--wave-gap)', zIndex: 1 },
+  playhead: { position: 'absolute', top: 0, bottom: 0, width: '1px', background: 'var(--gold-hi)', zIndex: 4, boxShadow: '0 0 8px rgba(212,168,50,0.6)', pointerEvents: 'none' },
+  playKnob: { position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: '7px', height: '7px', background: 'var(--gold-hi)' },
+  ruler: { position: 'relative', height: '34px', margin: '0 24px', borderTop: '1px solid #1c1a14' },
+  tickLabel: { fontSize: '10px', letterSpacing: '0.1em', color: 'var(--text-2)' },
+};
+
+function SegmentList({ segments, activeSeg, onSeekSeg }) {
+  return (
+    <div style={sl.panel}>
+      <div style={sl.head}>
+        <span className="mono" style={sl.headLabel}>ERKANNTE&nbsp;STILLE</span>
+        <span className="mono" style={sl.count}>{segments.length}</span>
+      </div>
+      <div style={sl.scroll}>
+        {segments.map((s) => {
+          const active = activeSeg === s.i;
+          return (
+            <button key={s.i} onClick={() => onSeekSeg(s.i)} style={{ ...sl.row, ...(active ? sl.rowActive : {}) }}
+              onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#16140f'; }}
+              onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}>
+              <span className="mono" style={{ ...sl.idx, color: active ? 'var(--gold-hi)' : 'var(--text-2)' }}>{s.label}</span>
+              <span className="mono" style={sl.time}>{fmt(s.start)}<span style={{ color: 'var(--text-2)' }}> → </span>{fmt(s.end)}</span>
+              <span className="mono" style={sl.dur}>{(s.dur).toFixed(2)}s</span>
+              <span style={{ ...sl.bar, width: `${Math.min(100, (s.dur / 4) * 100)}%` }} />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+const sl = {
+  panel: { background: 'var(--surface-1)', border: '1px solid #211f18', display: 'flex', flexDirection: 'column', height: '100%' },
+  head: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 22px 14px', borderBottom: '1px solid #1c1a14' },
+  headLabel: { fontSize: '11px', letterSpacing: '0.26em', color: 'var(--text-2)' },
+  count: { fontSize: '13px', color: 'var(--gold)', letterSpacing: '0.05em' },
+  scroll: { overflowY: 'auto', flex: 1, padding: '6px 0' },
+  row: {
+    position: 'relative', width: '100%', display: 'grid',
+    gridTemplateColumns: '34px 1fr auto', alignItems: 'center', gap: '12px',
+    padding: '13px 22px', background: 'transparent', border: 'none', borderLeft: '2px solid transparent',
+    cursor: 'pointer', transition: 'background 0.15s ease', textAlign: 'left',
+  },
+  rowActive: { background: 'rgba(139,58,42,0.12)', borderLeft: '2px solid var(--gold)' },
+  idx: { fontSize: '12px', letterSpacing: '0.08em' },
+  time: { fontSize: '12.5px', color: 'var(--text-1)', letterSpacing: '0.04em' },
+  dur: { fontSize: '12px', color: 'var(--gold)', letterSpacing: '0.04em' },
+  bar: { position: 'absolute', left: '22px', bottom: '6px', height: '1px', background: 'rgba(139,58,42,0.7)' },
+};
+
+Object.assign(window, { Waveform, SegmentList });
+</script>
+
+<!-- controls.jsx -->
+<script type="text/babel">
+function Slider({ label, sub, value, min, max, step, unit, onChange }) {
+  const pct = ((value - min) / (max - min)) * 100;
+  return (
+    <div style={cp.sliderBlock}>
+      <div style={cp.sliderTop}>
+        <div>
+          <div className="mono" style={cp.sLabel}>{label}</div>
+          <div className="mono" style={cp.sSub}>{sub}</div>
+        </div>
+        <div className="mono" style={cp.sValue}>
+          {value}<span style={cp.sUnit}>{unit}</span>
+        </div>
+      </div>
+      <input
+        type="range" min={min} max={max} step={step} value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className="impera-range"
+        style={{ background: `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, #26241c ${pct}%, #26241c 100%)` }}
+      />
+      <div style={cp.sScale}>
+        <span className="mono" style={cp.sScaleTxt}>{min}{unit}</span>
+        <span className="mono" style={cp.sScaleTxt}>{max}{unit}</span>
+      </div>
+    </div>
+  );
+}
+
+function ControlsPanel({ threshold, setThreshold, minLen, setMinLen, padding, setPadding,
+                         segments, saved, format, setFormat, status, progress, onCut, onReset }) {
+  const formats = ['WAV', 'MP3', 'FLAC'];
+  return (
+    <div style={cp.panel}>
+      <div style={cp.sliders}>
+        <Slider label="Erkennungsschwelle" sub="Threshold" value={threshold}
+          min={-60} max={-20} step={1} unit=" dB" onChange={setThreshold} />
+        <Slider label="Mindestlänge" sub="Min. Dauer" value={minLen}
+          min={100} max={1000} step={10} unit=" ms" onChange={setMinLen} />
+        <Slider label="Randabstand" sub="Padding" value={padding}
+          min={0} max={300} step={5} unit=" ms" onChange={setPadding} />
+      </div>
+
+      <div style={cp.divider} />
+
+      <div style={cp.statsRow}>
+        <div style={cp.stat}>
+          <span className="mono" style={cp.statBig}>{segments.length}</span>
+          <span className="mono" style={cp.statLbl}>Stellen erkannt</span>
+        </div>
+        <div style={cp.statSep} />
+        <div style={cp.stat}>
+          <span className="mono" style={cp.statBig}>{fmt(saved)}</span>
+          <span className="mono" style={cp.statLbl}>gespart</span>
+        </div>
+        <div style={cp.statSep} />
+        <div style={cp.stat}>
+          <span className="mono" style={cp.statBig}>{fmt(TOTAL_SEC - saved)}</span>
+          <span className="mono" style={cp.statLbl}>Endlänge</span>
+        </div>
+
+        <div style={{ flex: 1 }} />
+
+        <div style={cp.fmtWrap}>
+          <span className="mono" style={cp.fmtLabel}>FORMAT</span>
+          <div style={cp.fmtSeg}>
+            {formats.map((f) => (
+              <button key={f} onClick={() => setFormat(f)} className="mono"
+                style={{ ...cp.fmtBtn, ...(format === f ? cp.fmtBtnActive : {}) }}>
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {status === 'idle' && (
+        <button className="mono caps" style={cp.cta} onClick={onCut}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--gold-hi)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--gold)'; }}>
+          Schneiden&nbsp;&amp;&nbsp;Exportieren
+        </button>
+      )}
+
+      {status === 'cutting' && (
+        <div style={cp.progWrap}>
+          <div style={cp.progTop}>
+            <span className="mono" style={cp.progLabel}>VERARBEITUNG · {format}</span>
+            <span className="mono" style={cp.progPct}>{Math.round(progress)}%</span>
+          </div>
+          <div style={cp.progTrack}>
+            <div style={{ ...cp.progFill, width: `${progress}%` }} />
+          </div>
+        </div>
+      )}
+
+      {status === 'done' && (
+        <div style={cp.doneWrap}>
+          <div style={cp.doneLeft}>
+            <div style={cp.doneTri} />
+            <div>
+              <div className="mono" style={cp.doneTitle}>EXPORT ABGESCHLOSSEN</div>
+              <div className="mono" style={cp.doneSub}>impera_clean.{format.toLowerCase()} · {fmt(TOTAL_SEC - saved)} · {segments.length} Schnitte</div>
+            </div>
+          </div>
+          <button className="mono" style={cp.doneBtn} onClick={onReset}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}>
+            ERNEUT&nbsp;SCHNEIDEN
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const cp = {
+  panel: { background: 'var(--surface-1)', border: '1px solid #211f18', padding: '30px 32px 32px' },
+  sliders: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '44px' },
+  sliderBlock: {},
+  sliderTop: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '18px' },
+  sLabel: { fontSize: '13px', letterSpacing: '0.06em', color: 'var(--text-1)' },
+  sSub: { fontSize: '10.5px', letterSpacing: '0.2em', color: 'var(--text-2)', marginTop: '4px', textTransform: 'uppercase' },
+  sValue: { fontSize: '22px', color: 'var(--gold)', letterSpacing: '0.02em', whiteSpace: 'nowrap' },
+  sUnit: { fontSize: '13px', color: 'var(--text-2)', marginLeft: '2px' },
+  sScale: { display: 'flex', justifyContent: 'space-between', marginTop: '10px' },
+  sScaleTxt: { fontSize: '10px', letterSpacing: '0.08em', color: 'var(--text-2)', opacity: 0.6 },
+  divider: { height: '1px', background: '#1c1a14', margin: '30px 0 24px' },
+  statsRow: { display: 'flex', alignItems: 'center', gap: '26px', marginBottom: '28px', flexWrap: 'wrap' },
+  stat: { display: 'flex', flexDirection: 'column', gap: '5px' },
+  statBig: { fontSize: '24px', color: 'var(--gold)', letterSpacing: '0.02em', lineHeight: 1 },
+  statLbl: { fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-2)', textTransform: 'uppercase' },
+  statSep: { width: '1px', height: '34px', background: '#222019' },
+  fmtWrap: { display: 'flex', alignItems: 'center', gap: '14px' },
+  fmtLabel: { fontSize: '10.5px', letterSpacing: '0.22em', color: 'var(--text-2)' },
+  fmtSeg: { display: 'flex', border: '1px solid #2a2820' },
+  fmtBtn: { background: 'transparent', border: 'none', color: 'var(--text-2)', fontSize: '12px', letterSpacing: '0.12em', padding: '9px 15px', cursor: 'pointer', transition: 'all 0.18s ease', borderRight: '1px solid #2a2820' },
+  fmtBtnActive: { background: 'rgba(184,149,42,0.14)', color: 'var(--gold-hi)' },
+  cta: {
+    width: '100%', padding: '20px', background: 'var(--gold)', color: '#0d0d0b',
+    border: 'none', fontSize: '15px', letterSpacing: '0.32em', fontWeight: 500,
+    cursor: 'pointer', transition: 'background 0.2s ease',
+  },
+  progWrap: { padding: '4px 0' },
+  progTop: { display: 'flex', justifyContent: 'space-between', marginBottom: '12px' },
+  progLabel: { fontSize: '11px', letterSpacing: '0.24em', color: 'var(--text-2)' },
+  progPct: { fontSize: '12px', letterSpacing: '0.06em', color: 'var(--gold)' },
+  progTrack: { height: '3px', background: '#26241c', overflow: 'hidden' },
+  progFill: { height: '100%', background: 'var(--gold-hi)', transition: 'width 0.18s linear', boxShadow: '0 0 8px rgba(212,168,50,0.6)' },
+  doneWrap: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', border: '1px solid rgba(184,149,42,0.4)', background: 'rgba(184,149,42,0.06)' },
+  doneLeft: { display: 'flex', alignItems: 'center', gap: '16px' },
+  doneTri: { width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '14px solid var(--gold)' },
+  doneTitle: { fontSize: '12px', letterSpacing: '0.2em', color: 'var(--text-1)' },
+  doneSub: { fontSize: '11.5px', letterSpacing: '0.05em', color: 'var(--text-2)', marginTop: '5px' },
+  doneBtn: { background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em', padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease' },
+};
+
+Object.assign(window, { ControlsPanel });
+</script>
+
+<!-- main.jsx -->
+<script type="text/babel">
+const { useState: uS, useEffect: uE, useMemo: uM, useRef: uRf } = React;
+
+function App() {
+  const [fileName, setFileName] = uS(null);
+  const [threshold, setThreshold] = uS(-42);
+  const [minLen, setMinLen] = uS(320);
+  const [padding, setPadding] = uS(80);
+  const [playhead, setPlayhead] = uS(0.0);
+  const [activeSeg, setActiveSeg] = uS(null);
+  const [format, setFormat] = uS('MP3');
+  const [status, setStatus] = uS('idle');
+  const [progress, setProgress] = uS(0);
+  const timer = uRf(null);
+
+  const segments = uM(() => buildSegments(padding), [padding]);
+  const saved = uM(
+    () => segments.reduce((a, s) => a + Math.max(0, s.dur - (padding / 1000) * 2), 0),
+    [segments, padding]
+  );
+
+  function seekSeg(i) {
+    setActiveSeg(i);
+    const s = segments[i];
+    setPlayhead((s.start + s.dur / 2) / TOTAL_SEC);
+  }
+
+  function cut() {
+    setStatus('cutting');
+    setProgress(0);
+    clearInterval(timer.current);
+    timer.current = setInterval(() => {
+      setProgress((p) => {
+        const next = p + (1.6 + Math.random() * 3.2);
+        if (next >= 100) {
+          clearInterval(timer.current);
+          setTimeout(() => setStatus('done'), 260);
+          return 100;
+        }
+        return next;
+      });
+    }, 80);
+  }
+  function reset() { setStatus('idle'); setProgress(0); }
+  uE(() => () => clearInterval(timer.current), []);
+
+  return (
+    <div style={{ minHeight: '100vh', paddingBottom: '70px' }}>
+      <Header />
+
+      {!fileName ? (
+        <UploadZone onLoad={(name) => setFileName(name)} />
+      ) : (
+        <main style={app.main}>
+          <FileStrip name={fileName} onEject={() => { setFileName(null); reset(); }} />
+
+          <Waveform
+            barCount={210}
+            playhead={playhead}
+            setPlayhead={(f) => { setPlayhead(f); setActiveSeg(null); }}
+            segments={segments}
+            activeSeg={activeSeg}
+            onSeekSeg={seekSeg}
+          />
+
+          <div style={app.row}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <ControlsPanel
+                threshold={threshold} setThreshold={setThreshold}
+                minLen={minLen} setMinLen={setMinLen}
+                padding={padding} setPadding={setPadding}
+                segments={segments} saved={saved}
+                format={format} setFormat={setFormat}
+                status={status} progress={progress}
+                onCut={cut} onReset={reset}
+              />
+            </div>
+            <div style={app.aside}>
+              <SegmentList segments={segments} activeSeg={activeSeg} onSeekSeg={seekSeg} />
+            </div>
+          </div>
+        </main>
+      )}
+    </div>
+  );
+}
+
+const app = {
+  main: { maxWidth: '1360px', margin: '0 auto', padding: '40px 48px 0' },
+  row: { display: 'flex', gap: '20px', marginTop: '20px', alignItems: 'stretch' },
+  aside: { width: '360px', flexShrink: 0 },
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
+</html>
