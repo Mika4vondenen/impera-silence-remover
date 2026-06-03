@@ -18,13 +18,10 @@
     overflow: hidden;
   }
 
-  /* grid texture */
   body::before {
     content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
     background-image:
       linear-gradient(to right, #1e1e18 1px, transparent 1px),
       linear-gradient(to bottom, #1e1e18 1px, transparent 1px);
@@ -34,107 +31,119 @@
     -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, #000 30%, transparent 100%);
   }
 
-  .stage {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    animation: fadeIn 1s ease forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px);    filter: drop-shadow(0 0 36px rgba(184,149,42,0.18)); }
+    50%       { transform: translateY(-16px);  filter: drop-shadow(0 0 56px rgba(184,149,42,0.32)); }
+  }
+  /* StarButton light travels around border */
+  @keyframes star-travel {
+    to { offset-distance: 100%; }
+  }
 
+  .stage {
+    position: relative; z-index: 1;
+    width: 100%; height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+
+  /* logo: fade in first, then float forever */
   .logo-wrap {
-    width: 220px;
-    height: 220px;
+    width: 220px; height: 220px;
     color: #b8952a;
     margin-bottom: 44px;
-    animation: fadeIn 1.2s ease 0.1s both;
+    animation: fadein 1s ease 0.1s both, float 4.5s ease-in-out 1.4s infinite;
   }
-
-  .logo-wrap svg {
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 0 40px rgba(184,149,42,0.18));
-  }
+  .logo-wrap svg { width: 100%; height: 100%; }
 
   .wordmark {
     font-family: 'Cormorant Garamond', serif;
-    font-weight: 500;
-    font-size: 28px;
-    letter-spacing: 0.46em;
-    text-transform: uppercase;
+    font-weight: 500; font-size: 28px;
+    letter-spacing: 0.46em; text-transform: uppercase;
     color: #f0ead6;
-    animation: fadeIn 1s ease 0.25s both;
+    animation: fadeUp 0.9s ease 0.3s both;
     margin-bottom: 10px;
   }
-
   .sub {
     font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    color: #6b6550;
-    text-transform: uppercase;
-    animation: fadeIn 1s ease 0.35s both;
-    margin-bottom: 64px;
+    font-size: 11px; letter-spacing: 0.3em;
+    color: #6b6550; text-transform: uppercase;
+    animation: fadeUp 0.9s ease 0.42s both;
+    margin-bottom: 60px;
   }
-
   .divider {
-    width: 1px;
-    height: 48px;
+    width: 1px; height: 48px;
     background: linear-gradient(to bottom, transparent, rgba(184,149,42,0.4), transparent);
-    margin-bottom: 64px;
-    animation: fadeIn 1s ease 0.4s both;
+    margin-bottom: 60px;
+    animation: fadein 0.9s ease 0.55s both;
   }
 
-  .btn {
+  /* ── StarButton ── */
+  .star-btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.38em;
-    text-transform: uppercase;
-    color: #0d0d0b;
-    background: #b8952a;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 0.38em; text-transform: uppercase;
+    color: #f0ead6;
+    background: transparent;
     border: none;
-    padding: 18px 56px;
+    padding: 18px 60px;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-    animation: fadeIn 1s ease 0.5s both;
-    box-shadow: 0 0 0 rgba(184,149,42,0);
+    animation: fadeUp 0.9s ease 0.65s both;
+    /* --path set by JS after mount */
   }
-
-  .btn:hover {
-    background: #d4a832;
-    box-shadow: 0 0 32px rgba(212,168,50,0.25);
-    transform: translateY(-1px);
+  /* traveling glow */
+  .star-btn-light {
+    position: absolute;
+    width: 120px;
+    aspect-ratio: 1;
+    background: radial-gradient(ellipse at center, rgba(212,168,50,0.55), transparent 70%);
+    offset-path: var(--path);
+    offset-distance: 0%;
+    animation: star-travel 3s linear infinite;
+    pointer-events: none;
+    z-index: 1;
   }
-
-  .btn:active {
-    transform: translateY(0);
+  /* border overlay with star dots */
+  .star-btn-border {
+    position: absolute; inset: 0;
+    border: 1px solid rgba(184,149,42,0.45);
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+  }
+  .star-btn-border svg {
+    width: 100%; height: 100%;
+    opacity: 0.7;
+  }
+  .star-btn-text {
+    position: relative; z-index: 3;
   }
 
   .version {
-    position: fixed;
-    bottom: 24px;
-    right: 32px;
+    position: fixed; bottom: 24px; right: 32px;
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.14em;
+    font-size: 10px; letter-spacing: 0.14em;
     color: #2e2c22;
-    animation: fadeIn 1s ease 0.8s both;
+    animation: fadein 1s ease 1s both;
   }
 </style>
 </head>
 <body>
 <div class="stage">
+
+  <!-- Logo -->
   <div class="logo-wrap">
     <svg viewBox="0 0 796.38574 691.89514" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <g transform="translate(-20.614271,-21.071169)">
@@ -147,9 +156,37 @@
   <div class="sub">Silence Remover</div>
   <div class="divider"></div>
 
-  <button class="btn" onclick="window.location.href='app.html'">Starten</button>
+  <!-- StarButton -->
+  <button class="star-btn" id="startBtn" onclick="window.location.href='app.html'">
+    <div class="star-btn-light" id="starLight"></div>
+    <div class="star-btn-border">
+      <svg preserveAspectRatio="none" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#sc)">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M56.1 3.96C56.46 3.96 56.76 4.26 56.76 4.62C56.76 4.98 56.46 5.28 56.1 5.28C55.74 5.28 55.44 4.98 55.44 4.62C55.44 4.26 55.74 3.96 56.1 3.96ZM40.26 17.16C40.62 17.16 40.92 17.46 40.92 17.82C40.92 18.18 40.62 18.48 40.26 18.48C39.9 18.48 39.6 18.18 39.6 17.82C39.6 17.46 39.9 17.16 40.26 17.16ZM74.58 5.28C74.94 5.28 75.24 5.58 75.24 5.94C75.24 6.3 74.94 6.6 74.58 6.6C74.22 6.6 73.92 6.3 73.92 5.94C73.92 5.58 74.22 5.28 74.58 5.28ZM21.66 33.52C22.02 33.52 22.32 33.82 22.32 34.18C22.32 34.54 22.02 34.84 21.66 34.84C21.3 34.84 21 34.54 21 34.18C21 33.82 21.3 33.52 21.66 33.52ZM8.16 32.86C8.16 32.5 7.86 32.2 7.5 32.2C7.14 32.2 6.84 32.5 6.84 32.86C6.84 33.22 7.14 33.52 7.5 33.52C7.86 33.52 8.16 33.22 8.16 32.86ZM7.5 23.68C7.86 23.68 8.16 23.98 8.16 24.34C8.16 24.7 7.86 25 7.5 25C7.14 25 6.84 24.7 6.84 24.34C6.84 23.98 7.14 23.68 7.5 23.68ZM19.32 18.48C19.32 18.12 19.02 17.82 18.66 17.82C18.3 17.82 18 18.12 18 18.48C18 18.84 18.3 19.14 18.66 19.14C19.02 19.14 19.32 18.84 19.32 18.48ZM5.66 11.84C6.02 11.84 6.32 12.14 6.32 12.5C6.32 12.86 6.02 13.16 5.66 13.16C5.3 13.16 5 12.86 5 12.5C5 12.14 5.3 11.84 5.66 11.84ZM35.16 35.5C35.16 35.14 34.86 34.84 34.5 34.84C34.14 34.84 33.84 35.14 33.84 35.5C33.84 35.86 34.14 36.16 34.5 36.16C34.86 36.16 35.16 35.86 35.16 35.5ZM53.5 36.18C53.86 36.18 54.16 36.48 54.16 36.84C54.16 37.2 53.86 37.5 53.5 37.5C53.14 37.5 52.84 37.2 52.84 36.84C52.84 36.48 53.14 36.18 53.5 36.18ZM48.5 28.66C48.5 28.3 48.2 28 47.84 28C47.48 28 47.18 28.3 47.18 28.66C47.18 29.02 47.48 29.32 47.84 29.32C48.2 29.32 48.5 29.02 48.5 28.66ZM60.34 27.34C60.7 27.34 61 27.64 61 28C61 28.36 60.7 28.66 60.34 28.66C59.98 28.66 59.68 28.36 59.68 28C59.68 27.64 59.98 27.34 60.34 27.34ZM56.28 16.5C56.28 16.14 55.99 15.84 55.62 15.84C55.26 15.84 54.96 16.14 54.96 16.5C54.96 16.86 55.26 17.16 55.62 17.16C55.99 17.16 56.28 16.86 56.28 16.5ZM46.2 7.26C46.2 6.9 45.9 6.6 45.54 6.6C45.18 6.6 44.88 6.9 44.88 7.26C44.88 7.62 45.18 7.92 45.54 7.92C45.9 7.92 46.2 7.62 46.2 7.26ZM33 9.34C33 8.98 32.7 8.68 32.34 8.68C31.98 8.68 31.68 8.98 31.68 9.34C31.68 9.7 31.98 10 32.34 10C32.7 10 33 9.7 33 9.34ZM16 4.86C16.36 4.86 16.66 5.15 16.66 5.52C16.66 5.88 16.36 6.18 16 6.18C15.64 6.18 15.34 5.88 15.34 5.52C15.34 5.15 15.64 4.86 16 4.86ZM69.66 21.16C69.66 20.8 69.36 20.5 69 20.5C68.64 20.5 68.34 20.8 68.34 21.16C68.34 21.52 68.64 21.82 69 21.82C69.36 21.82 69.66 21.52 69.66 21.16ZM80.52 15.18C80.52 14.82 80.22 14.52 79.86 14.52C79.5 14.52 79.2 14.82 79.2 15.18C79.2 15.54 79.5 15.84 79.86 15.84C80.22 15.84 80.52 15.54 80.52 15.18ZM85.66 24.34C86.02 24.34 86.32 24.64 86.32 25C86.32 25.36 86.02 25.66 85.66 25.66C85.3 25.66 85 25.36 85 25C85 24.64 85.3 24.34 85.66 24.34ZM91.32 10C91.32 9.64 91.02 9.34 90.66 9.34C90.3 9.34 90 9.64 90 10C90 10.36 90.3 10.66 90.66 10.66C91.02 10.66 91.32 10.36 91.32 10Z"
+            fill="#b8952a"/>
+        </g>
+        <defs>
+          <clipPath id="sc"><rect width="100" height="40" fill="white"/></clipPath>
+        </defs>
+      </svg>
+    </div>
+    <span class="star-btn-text">Starten</span>
+  </button>
 </div>
 
-<div class="version">v1.0.0</div>
+<div class="version">v1.1.0</div>
+
+<script>
+  // Set offset-path for the traveling light after layout
+  window.addEventListener('load', () => {
+    const btn = document.getElementById('startBtn');
+    const light = document.getElementById('starLight');
+    const w = btn.offsetWidth;
+    const h = btn.offsetHeight;
+    btn.style.setProperty('--path', `path('M 0 0 H ${w} V ${h} H 0 V 0')`);
+    light.style.offsetPath = `path('M 0 0 H ${w} V ${h} H 0 V 0')`;
+  });
+</script>
 </body>
 </html>

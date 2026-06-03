@@ -6,98 +6,57 @@
 <title>IMPERA AUTOMATION — Silence Remover</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600&family=Playfair+Display:wght@500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #0d0d0b;
-    --surface-1: #141410;
-    --surface-2: #1a1a14;
-    --gold: #b8952a;
-    --gold-hi: #d4a832;
-    --grid: #1e1e18;
-    --grid-alpha: 0.55;
-    --text-1: #f0ead6;
-    --text-2: #6b6550;
+    --bg: #0d0d0b; --surface-1: #141410; --surface-2: #1a1a14;
+    --gold: #b8952a; --gold-hi: #d4a832;
+    --grid: #1e1e18; --grid-alpha: 0.55;
+    --text-1: #f0ead6; --text-2: #6b6550;
     --danger: #8b3a2a;
     --font-display: 'Cormorant Garamond', serif;
     --font-mono: 'DM Mono', ui-monospace, monospace;
-    --wave-bar: 2px;
     --wave-gap: 2px;
   }
-
   * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0; padding: 0;
-    background: var(--bg);
-    color: var(--text-1);
-    font-family: var(--font-mono);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text-1); font-family: var(--font-mono); -webkit-font-smoothing: antialiased; }
   body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background-image:
-      linear-gradient(to right, var(--grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
-    background-size: 56px 56px;
-    opacity: var(--grid-alpha);
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px), linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 56px 56px; opacity: var(--grid-alpha);
     mask-image: radial-gradient(ellipse 120% 90% at 50% 30%, #000 35%, transparent 100%);
     -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 30%, #000 35%, transparent 100%);
   }
-
   #root { position: relative; z-index: 1; }
-
   ::selection { background: rgba(184,149,42,0.3); color: var(--text-1); }
-
   *::-webkit-scrollbar { width: 9px; height: 9px; }
   *::-webkit-scrollbar-track { background: transparent; }
   *::-webkit-scrollbar-thumb { background: #2a2a20; }
   *::-webkit-scrollbar-thumb:hover { background: #3a3a2c; }
-
   .mono { font-family: var(--font-mono); }
   .display { font-family: var(--font-display); }
+  .caps { text-transform: uppercase; letter-spacing: 0.42em; font-weight: 500; }
 
-  .caps {
-    text-transform: uppercase;
-    letter-spacing: 0.42em;
-    font-weight: 500;
-  }
-
-  input.impera-range {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 2px;
-    outline: none;
-    cursor: pointer;
-    margin: 0;
-  }
-  input.impera-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 2px;
-    height: 22px;
-    background: var(--gold-hi);
-    border: none;
-    box-shadow: 0 0 0 1px var(--bg), 0 0 10px rgba(212,168,50,0.5);
-    cursor: pointer;
-  }
-  input.impera-range::-moz-range-thumb {
-    width: 2px;
-    height: 22px;
-    background: var(--gold-hi);
-    border: none;
-    border-radius: 0;
-    box-shadow: 0 0 0 1px var(--bg), 0 0 10px rgba(212,168,50,0.5);
-    cursor: pointer;
-  }
+  /* Range sliders */
+  input.impera-range { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; outline: none; cursor: pointer; margin: 0; }
+  input.impera-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 2px; height: 22px; background: var(--gold-hi); border: none; box-shadow: 0 0 0 1px var(--bg), 0 0 10px rgba(212,168,50,0.5); cursor: pointer; }
+  input.impera-range::-moz-range-thumb { width: 2px; height: 22px; background: var(--gold-hi); border: none; border-radius: 0; box-shadow: 0 0 0 1px var(--bg), 0 0 10px rgba(212,168,50,0.5); cursor: pointer; }
   input.impera-range::-moz-range-track { background: transparent; }
+
+  /* StarButton */
+  @keyframes star-travel { to { offset-distance: 100%; } }
+  .star-btn-light {
+    position: absolute; width: 100px; aspect-ratio: 1;
+    background: radial-gradient(ellipse at center, rgba(212,168,50,0.5), transparent 70%);
+    offset-path: var(--path, none); offset-distance: 0%;
+    animation: star-travel 3s linear infinite;
+    pointer-events: none; z-index: 1;
+  }
+  .star-btn-border {
+    position: absolute; inset: 0; border: 1px solid rgba(184,149,42,0.4);
+    pointer-events: none; z-index: 2; overflow: hidden;
+  }
+  .star-btn-border svg { width: 100%; height: 100%; opacity: 0.65; }
 </style>
 </head>
 <body>
@@ -107,324 +66,313 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-<!-- components.jsx -->
+<!-- ── StarButton + helpers ── -->
 <script type="text/babel">
-const { useState, useEffect, useRef, useMemo } = React;
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
-function LogoMark({ size = 30 }) {
-  const id = useMemo(() => 'hatch' + Math.random().toString(36).slice(2, 7), []);
+function StarDots() {
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <defs>
-        <pattern id={id} width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="3.4" stroke="var(--gold)" strokeWidth="0.7" />
-        </pattern>
-        <clipPath id={id + 'clip'}>
-          <path d="M3 6 L37 6 L20 36 Z" />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${id}clip)`}>
-        <rect x="0" y="0" width="40" height="40" fill={`url(#${id})`} opacity="0.85" />
+    <svg preserveAspectRatio="none" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#sdc)">
+        <path fillRule="evenodd" clipRule="evenodd"
+          d="M56.1 3.96C56.46 3.96 56.76 4.26 56.76 4.62C56.76 4.98 56.46 5.28 56.1 5.28C55.74 5.28 55.44 4.98 55.44 4.62C55.44 4.26 55.74 3.96 56.1 3.96ZM40.26 17.16C40.62 17.16 40.92 17.46 40.92 17.82C40.92 18.18 40.62 18.48 40.26 18.48C39.9 18.48 39.6 18.18 39.6 17.82C39.6 17.46 39.9 17.16 40.26 17.16ZM74.58 5.28C74.94 5.28 75.24 5.58 75.24 5.94C75.24 6.3 74.94 6.6 74.58 6.6C74.22 6.6 73.92 6.3 73.92 5.94C73.92 5.58 74.22 5.28 74.58 5.28ZM21.66 33.52C22.02 33.52 22.32 33.82 22.32 34.18C22.32 34.54 22.02 34.84 21.66 34.84C21.3 34.84 21 34.54 21 34.18C21 33.82 21.3 33.52 21.66 33.52ZM8.16 32.86C8.16 32.5 7.86 32.2 7.5 32.2C7.14 32.2 6.84 32.5 6.84 32.86C6.84 33.22 7.14 33.52 7.5 33.52C7.86 33.52 8.16 33.22 8.16 32.86ZM7.5 23.68C7.86 23.68 8.16 23.98 8.16 24.34C8.16 24.7 7.86 25 7.5 25C7.14 25 6.84 24.7 6.84 24.34C6.84 23.98 7.14 23.68 7.5 23.68ZM5.66 11.84C6.02 11.84 6.32 12.14 6.32 12.5C6.32 12.86 6.02 13.16 5.66 13.16C5.3 13.16 5 12.86 5 12.5C5 12.14 5.3 11.84 5.66 11.84ZM35.16 35.5C35.16 35.14 34.86 34.84 34.5 34.84C34.14 34.84 33.84 35.14 33.84 35.5C33.84 35.86 34.14 36.16 34.5 36.16C34.86 36.16 35.16 35.86 35.16 35.5ZM53.5 36.18C53.86 36.18 54.16 36.48 54.16 36.84C54.16 37.2 53.86 37.5 53.5 37.5C53.14 37.5 52.84 37.2 52.84 36.84C52.84 36.48 53.14 36.18 53.5 36.18ZM47.84 28C48.2 28 48.5 28.3 48.5 28.66C48.5 29.02 48.2 29.32 47.84 29.32C47.48 29.32 47.18 29.02 47.18 28.66C47.18 28.3 47.48 28 47.84 28ZM60.34 27.34C60.7 27.34 61 27.64 61 28C61 28.36 60.7 28.66 60.34 28.66C59.98 28.66 59.68 28.36 59.68 28C59.68 27.64 59.98 27.34 60.34 27.34ZM45.54 6.6C45.9 6.6 46.2 6.9 46.2 7.26C46.2 7.62 45.9 7.92 45.54 7.92C45.18 7.92 44.88 7.62 44.88 7.26C44.88 6.9 45.18 6.6 45.54 6.6ZM32.34 8.68C32.7 8.68 33 8.98 33 9.34C33 9.7 32.7 10 32.34 10C31.98 10 31.68 9.7 31.68 9.34C31.68 8.98 31.98 8.68 32.34 8.68ZM16 4.86C16.36 4.86 16.66 5.15 16.66 5.52C16.66 5.88 16.36 6.18 16 6.18C15.64 6.18 15.34 5.88 15.34 5.52C15.34 5.15 15.64 4.86 16 4.86ZM69.66 21.16C69.66 20.8 69.36 20.5 69 20.5C68.64 20.5 68.34 20.8 68.34 21.16C68.34 21.52 68.64 21.82 69 21.82C69.36 21.82 69.66 21.52 69.66 21.16ZM79.86 14.52C80.22 14.52 80.52 14.82 80.52 15.18C80.52 15.54 80.22 15.84 79.86 15.84C79.5 15.84 79.2 15.54 79.2 15.18C79.2 14.82 79.5 14.52 79.86 14.52ZM85.66 24.34C86.02 24.34 86.32 24.64 86.32 25C86.32 25.36 86.02 25.66 85.66 25.66C85.3 25.66 85 25.36 85 25C85 24.64 85.3 24.34 85.66 24.34ZM91.32 10C91.32 9.64 91.02 9.34 90.66 9.34C90.3 9.34 90 9.64 90 10C90 10.36 90.3 10.66 90.66 10.66C91.02 10.66 91.32 10.36 91.32 10Z"
+          fill="#b8952a" />
       </g>
-      <path d="M3 6 L37 6 L20 36 Z" stroke="var(--gold)" strokeWidth="1.1" fill="none" />
+      <defs><clipPath id="sdc"><rect width="100" height="40" fill="white"/></clipPath></defs>
     </svg>
   );
 }
 
-const TOTAL_SEC = 278;
-function fmt(sec, withMs) {
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  const base = `${m}:${String(s).padStart(2, '0')}`;
-  if (!withMs) return base;
-  const ms = Math.round((sec - Math.floor(sec)) * 1000);
-  return `${base}.${String(ms).padStart(3, '0')}`;
+function StarButton({ children, onClick, style, fullWidth, disabled }) {
+  const btnRef = useRef(null);
+  const lightRef = useRef(null);
+
+  useEffect(() => {
+    if (!btnRef.current || !lightRef.current) return;
+    const w = btnRef.current.offsetWidth;
+    const h = btnRef.current.offsetHeight;
+    const p = `path('M 0 0 H ${w} V ${h} H 0 V 0')`;
+    btnRef.current.style.setProperty('--path', p);
+    lightRef.current.style.offsetPath = p;
+  }, []);
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        position: 'relative', overflow: 'hidden', isolation: 'isolate',
+        fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 500,
+        letterSpacing: '0.32em', textTransform: 'uppercase',
+        color: 'var(--text-1)', background: 'transparent',
+        border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
+        padding: '18px 32px',
+        width: fullWidth ? '100%' : undefined,
+        opacity: disabled ? 0.5 : 1,
+        transition: 'opacity 0.2s ease',
+        ...style,
+      }}
+    >
+      <div ref={lightRef} className="star-btn-light" />
+      <div className="star-btn-border"><StarDots /></div>
+      <span style={{ position: 'relative', zIndex: 3 }}>{children}</span>
+    </button>
+  );
 }
 
-const SILENCE = [
-  [0.066, 0.094],
-  [0.205, 0.252],
-  [0.331, 0.352],
-  [0.468, 0.529],
-  [0.611, 0.640],
-  [0.742, 0.788],
-  [0.886, 0.918],
-];
-
-function mulberry(seed) {
-  return function () {
-    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function inSilence(frac) {
-  for (let i = 0; i < SILENCE.length; i++) {
-    if (frac >= SILENCE[i][0] && frac <= SILENCE[i][1]) return i;
-  }
-  return -1;
-}
-
-function buildBars(count) {
-  const rnd = mulberry(20260602);
-  const bars = [];
-  let env = 0.4;
-  for (let i = 0; i < count; i++) {
-    const frac = i / (count - 1);
-    const seg = inSilence(frac);
-    if (seg >= 0) {
-      bars.push({ amp: 0.02 + rnd() * 0.03, seg });
-      env = 0.3 + rnd() * 0.2;
-      continue;
-    }
-    env += (rnd() - 0.5) * 0.28;
-    env = Math.max(0.28, Math.min(0.96, env));
-    const detail = 0.45 + rnd() * 0.55;
-    let amp = env * detail;
-    if (rnd() > 0.93) amp = Math.min(1, amp * 1.35);
-    bars.push({ amp: Math.max(0.05, amp), seg: -1 });
-  }
-  return bars;
-}
-
-function buildSegments(padMs) {
-  return SILENCE.map(([a, b], i) => {
-    const start = a * TOTAL_SEC;
-    const end = b * TOTAL_SEC;
-    return { i, start, end, dur: end - start, label: `${String(i + 1).padStart(2, '0')}` };
-  });
-}
-
-Object.assign(window, { LogoMark, fmt, buildBars, buildSegments, SILENCE, inSilence, TOTAL_SEC });
+Object.assign(window, { StarButton, StarDots });
 </script>
 
-<!-- zones.jsx -->
+<!-- ── Shared helpers ── -->
 <script type="text/babel">
-const { useState: useS, useEffect: useE, useRef: useR, useMemo: useM } = React;
+function LogoMark({ size = 30 }) {
+  const id = useMemo(() => 'h' + Math.random().toString(36).slice(2,7), []);
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
+      <defs>
+        <pattern id={id} width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="3.4" stroke="var(--gold)" strokeWidth="0.7"/>
+        </pattern>
+        <clipPath id={id+'c'}><path d="M3 6 L37 6 L20 36 Z"/></clipPath>
+      </defs>
+      <g clipPath={`url(#${id}c)`}><rect x="0" y="0" width="40" height="40" fill={`url(#${id})`} opacity="0.85"/></g>
+      <path d="M3 6 L37 6 L20 36 Z" stroke="var(--gold)" strokeWidth="1.1" fill="none"/>
+    </svg>
+  );
+}
 
-function Header() {
+function fmt(sec, withMs) {
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  const base = `${m}:${String(s).padStart(2,'0')}`;
+  if (!withMs) return base;
+  const ms = Math.round((sec - Math.floor(sec)) * 1000);
+  return `${base}.${String(ms).padStart(3,'0')}`;
+}
+
+// ── Real Audio Analysis ──────────────────────────────────────────────────────
+function buildBarsFromAudio(channelData, count) {
+  const blockSize = Math.floor(channelData.length / count);
+  const raw = [];
+  for (let i = 0; i < count; i++) {
+    let max = 0;
+    const end = Math.min((i + 1) * blockSize, channelData.length);
+    for (let j = i * blockSize; j < end; j++) {
+      const v = Math.abs(channelData[j]);
+      if (v > max) max = v;
+    }
+    raw.push(max);
+  }
+  const peak = Math.max(...raw, 0.001);
+  return raw.map(v => v / peak);
+}
+
+function computeRmsWindows(channelData, sampleRate) {
+  const windowSec = 0.01; // 10 ms
+  const windowSamples = Math.floor(sampleRate * windowSec);
+  const windows = [];
+  for (let i = 0; i < channelData.length; i += windowSamples) {
+    let sum = 0;
+    const end = Math.min(i + windowSamples, channelData.length);
+    for (let j = i; j < end; j++) sum += channelData[j] * channelData[j];
+    windows.push({ t: i / sampleRate, rms: Math.sqrt(sum / (end - i)) });
+  }
+  return windows;
+}
+
+function detectSilence(rmsWindows, totalSec, thresholdDb, minLenMs, paddingMs) {
+  const thresh = Math.pow(10, thresholdDb / 20);
+  const minLenSec = minLenMs / 1000;
+  const padSec = paddingMs / 1000;
+  const silences = [];
+  let start = null;
+
+  for (let i = 0; i < rmsWindows.length; i++) {
+    const { t, rms } = rmsWindows[i];
+    if (rms < thresh) {
+      if (start === null) start = t;
+    } else {
+      if (start !== null) {
+        const dur = t - start;
+        if (dur >= minLenSec) {
+          const s = start + padSec;
+          const e = t - padSec;
+          if (e > s) silences.push({ start: s, end: e, dur: e - s });
+        }
+        start = null;
+      }
+    }
+  }
+  // trailing silence
+  if (start !== null) {
+    const dur = totalSec - start;
+    if (dur >= minLenSec) {
+      const s = start + padSec;
+      const e = totalSec - padSec;
+      if (e > s) silences.push({ start: s, end: e, dur: e - s });
+    }
+  }
+  return silences.map((s, i) => ({ ...s, i, label: String(i + 1).padStart(2, '0') }));
+}
+
+Object.assign(window, { LogoMark, fmt, buildBarsFromAudio, computeRmsWindows, detectSilence });
+</script>
+
+<!-- ── Header + Upload zones ── -->
+<script type="text/babel">
+function Header({ mode, setMode }) {
   return (
     <header style={hz.bar}>
       <div style={hz.brand}>
         <LogoMark size={32} />
         <span className="caps display" style={hz.word}>Impera&nbsp;Automation</span>
       </div>
-      <div style={hz.toolWrap}>
-        <span style={hz.toolDot} />
-        <span className="mono" style={hz.tool}>SILENCE&nbsp;REMOVER</span>
-      </div>
+      <nav style={hz.nav}>
+        {['silence','convert'].map(m => (
+          <button key={m} className="mono" onClick={() => setMode(m)}
+            style={{ ...hz.navBtn, ...(mode === m ? hz.navBtnActive : {}) }}>
+            {m === 'silence' ? 'SILENCE REMOVER' : 'KONVERTIERUNG'}
+          </button>
+        ))}
+      </nav>
     </header>
   );
 }
 const hz = {
-  bar: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '26px 48px', borderBottom: '1px solid rgba(184,149,42,0.5)',
-    background: 'linear-gradient(to bottom, rgba(184,149,42,0.04), transparent)',
-  },
+  bar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 48px', borderBottom: '1px solid rgba(184,149,42,0.5)', background: 'linear-gradient(to bottom, rgba(184,149,42,0.04), transparent)' },
   brand: { display: 'flex', alignItems: 'center', gap: '18px' },
   word: { fontSize: '22px', color: 'var(--text-1)', lineHeight: 1, paddingTop: '2px' },
-  toolWrap: { display: 'flex', alignItems: 'center', gap: '12px' },
-  toolDot: { width: '5px', height: '5px', background: 'var(--gold)', transform: 'rotate(45deg)' },
-  tool: { fontSize: '12px', letterSpacing: '0.3em', color: 'var(--text-2)', fontWeight: 400 },
+  nav: { display: 'flex', gap: '2px' },
+  navBtn: { background: 'transparent', border: 'none', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.28em', padding: '10px 18px', cursor: 'pointer', transition: 'all 0.2s ease', borderBottom: '2px solid transparent' },
+  navBtnActive: { color: 'var(--gold)', borderBottom: '2px solid var(--gold)' },
 };
 
-function UploadZone({ onLoad }) {
-  const [drag, setDrag] = useS(false);
-  const inputRef = useR(null);
-
-  function handleFiles(files) {
-    if (files && files.length > 0) onLoad(files[0].name);
-  }
-
+function UploadZone({ onLoad, accept, label, hint }) {
+  const [drag, setDrag] = useState(false);
+  const inputRef = useRef(null);
   return (
-    <div style={uz.outer}>
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".mp3,.wav,.flac,.m4a,audio/*"
-        style={{ display: 'none' }}
-        onChange={(e) => handleFiles(e.target.files)}
-      />
+    <div style={{ padding: '64px 48px 80px' }}>
+      <input ref={inputRef} type="file" accept={accept} style={{ display: 'none' }}
+        onChange={e => { if (e.target.files[0]) onLoad(e.target.files[0]); }} />
       <div
         onClick={() => inputRef.current.click()}
-        onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+        onDragOver={e => { e.preventDefault(); setDrag(true); }}
         onDragLeave={() => setDrag(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDrag(false);
-          handleFiles(e.dataTransfer.files);
-        }}
-        style={{
-          ...uz.drop,
-          borderColor: drag ? 'var(--gold-hi)' : 'var(--gold)',
-          background: drag ? 'rgba(184,149,42,0.05)' : 'transparent',
-        }}
-      >
-        <div style={{ ...uz.tri, borderTopColor: drag ? 'var(--gold-hi)' : 'var(--gold)' }} />
-        <div className="display caps" style={uz.headline}>Audio-Datei&nbsp;ablegen</div>
-        <div className="mono" style={uz.sub}>oder klicken zum Auswählen</div>
-        <div className="mono" style={uz.hint}>WAV · MP3 · FLAC · M4A — bis 2 GB</div>
+        onDrop={e => { e.preventDefault(); setDrag(false); if (e.dataTransfer.files[0]) onLoad(e.dataTransfer.files[0]); }}
+        style={{ maxWidth: '900px', margin: '0 auto', height: '320px', border: `1px dashed ${drag ? 'var(--gold-hi)' : 'var(--gold)'}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.25s ease', background: drag ? 'rgba(184,149,42,0.05)' : 'transparent' }}>
+        <div style={{ width: 0, height: 0, borderLeft: '22px solid transparent', borderRight: '22px solid transparent', borderTop: `34px solid ${drag ? 'var(--gold-hi)' : 'var(--gold)'}`, marginBottom: '26px', transition: 'border-top-color 0.25s ease' }} />
+        <div className="display caps" style={{ fontSize: '28px', letterSpacing: '0.32em', color: 'var(--text-1)' }}>{label}</div>
+        <div className="mono" style={{ fontSize: '13px', letterSpacing: '0.18em', color: 'var(--text-2)', marginTop: '6px' }}>oder klicken zum Auswählen</div>
+        <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.22em', color: 'var(--text-2)', marginTop: '20px', opacity: 0.7 }}>{hint}</div>
       </div>
     </div>
   );
 }
-const uz = {
-  outer: { padding: '64px 48px 80px' },
-  drop: {
-    maxWidth: '900px', margin: '0 auto', height: '340px',
-    border: '1px dashed var(--gold)', display: 'flex', flexDirection: 'column',
-    alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer',
-    transition: 'all 0.25s ease', position: 'relative',
-  },
-  tri: {
-    width: 0, height: 0, borderLeft: '22px solid transparent', borderRight: '22px solid transparent',
-    borderTop: '34px solid var(--gold)', marginBottom: '26px', transition: 'border-top-color 0.25s ease',
-  },
-  headline: { fontSize: '30px', letterSpacing: '0.32em', color: 'var(--text-1)' },
-  sub: { fontSize: '13px', letterSpacing: '0.18em', color: 'var(--text-2)', marginTop: '6px' },
-  hint: { fontSize: '11px', letterSpacing: '0.22em', color: 'var(--text-2)', marginTop: '22px', opacity: 0.7 },
-};
 
-function FileStrip({ name, onEject }) {
+function FileStrip({ name, meta, onEject }) {
   return (
-    <div style={uz.strip}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', background: 'var(--surface-1)', border: '1px solid #211f18', marginBottom: '20px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
-        <div style={uz.smallTri} />
-        <span className="mono" style={uz.fname}>{name}</span>
-        <span className="mono" style={uz.fmeta}>· {fmt(TOTAL_SEC)} · 44.1 kHz · Stereo</span>
+        <div style={{ width: 0, height: 0, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '11px solid var(--gold)' }} />
+        <span className="mono" style={{ fontSize: '14px', letterSpacing: '0.04em', color: 'var(--text-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+        {meta && <span className="mono" style={{ fontSize: '12px', letterSpacing: '0.06em', color: 'var(--text-2)', whiteSpace: 'nowrap' }}>{meta}</span>}
       </div>
-      <button className="mono" style={uz.eject} onClick={onEject}
-        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}>
-        DATEI&nbsp;WECHSELN
-      </button>
+      <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em', padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+        onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+        onClick={onEject}>DATEI&nbsp;WECHSELN</button>
     </div>
   );
 }
-uz.strip = {
-  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-  padding: '16px 24px', background: 'var(--surface-1)', border: '1px solid #211f18',
-  marginBottom: '20px',
-};
-uz.smallTri = { width: 0, height: 0, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '11px solid var(--gold)' };
-uz.fname = { fontSize: '14px', letterSpacing: '0.04em', color: 'var(--text-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
-uz.fmeta = { fontSize: '12px', letterSpacing: '0.06em', color: 'var(--text-2)', whiteSpace: 'nowrap' };
-uz.eject = {
-  background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)',
-  fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em',
-  padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0,
-};
 
 Object.assign(window, { Header, UploadZone, FileStrip });
 </script>
 
-<!-- waveform.jsx -->
+<!-- ── Waveform + SegmentList ── -->
 <script type="text/babel">
-const { useState: useWS, useRef: useWR, useMemo: useWM } = React;
-
-function Waveform({ barCount, playhead, setPlayhead, segments, activeSeg, onSeekSeg }) {
-  const bars = useWM(() => buildBars(barCount), [barCount]);
-  const ref = useWR(null);
+function Waveform({ bars, totalSec, playhead, setPlayhead, segments, activeSeg, onSeekSeg, analyzing }) {
+  const ref = useRef(null);
 
   function seek(e) {
     const r = ref.current.getBoundingClientRect();
-    const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-    setPlayhead(f);
+    setPlayhead(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)));
   }
 
   const ticks = [];
-  const step = 30;
-  for (let t = 0; t <= TOTAL_SEC; t += step) ticks.push(t);
+  const step = totalSec > 120 ? 30 : totalSec > 60 ? 15 : 10;
+  for (let t = 0; t <= totalSec; t += step) ticks.push(t);
 
   return (
-    <div style={wv.panel}>
-      <div style={wv.head}>
-        <span className="mono" style={wv.headLabel}>WELLENFORM</span>
-        <span className="mono" style={wv.headMeta}>
-          <span style={{ color: 'var(--text-1)' }}>{fmt(playhead * TOTAL_SEC, true)}</span>
-          <span style={{ opacity: 0.5 }}> / {fmt(TOTAL_SEC, true)}</span>
+    <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px 14px', borderBottom: '1px solid #1c1a14' }}>
+        <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.28em', color: 'var(--text-2)' }}>WELLENFORM</span>
+        <span className="mono" style={{ fontSize: '13px', letterSpacing: '0.08em' }}>
+          <span style={{ color: 'var(--text-1)' }}>{fmt(playhead * totalSec, true)}</span>
+          <span style={{ opacity: 0.5 }}> / {fmt(totalSec, true)}</span>
         </span>
       </div>
 
-      <div ref={ref} style={wv.canvas} onClick={seek}>
-        {segments.map((s) => (
-          <div
-            key={s.i}
-            onClick={(e) => { e.stopPropagation(); onSeekSeg(s.i); }}
-            title={`Stille ${s.label}`}
-            style={{
-              position: 'absolute', top: 0, bottom: 0,
-              left: `${(s.start / TOTAL_SEC) * 100}%`,
-              width: `${(s.dur / TOTAL_SEC) * 100}%`,
-              background: activeSeg === s.i ? 'rgba(139,58,42,0.42)' : 'rgba(139,58,42,0.24)',
-              borderLeft: '1px solid rgba(184,149,42,0.6)',
-              borderRight: '1px solid rgba(184,149,42,0.6)',
-              cursor: 'pointer', zIndex: 2, transition: 'background 0.18s ease',
-            }}
-          />
+      <div ref={ref} onClick={seek}
+        style={{ position: 'relative', height: '240px', padding: '28px 24px', cursor: 'crosshair', overflow: 'hidden' }}>
+
+        {analyzing && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(13,13,11,0.7)', zIndex: 10 }}>
+            <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.3em', color: 'var(--gold)' }}>ANALYSIERE AUDIO…</span>
+          </div>
+        )}
+
+        {segments.map(s => (
+          <div key={s.i} onClick={e => { e.stopPropagation(); onSeekSeg(s.i); }}
+            style={{ position: 'absolute', top: 0, bottom: 0, left: `${(s.start / totalSec) * 100}%`, width: `${(s.dur / totalSec) * 100}%`, background: activeSeg === s.i ? 'rgba(139,58,42,0.42)' : 'rgba(139,58,42,0.24)', borderLeft: '1px solid rgba(184,149,42,0.6)', borderRight: '1px solid rgba(184,149,42,0.6)', cursor: 'pointer', zIndex: 2, transition: 'background 0.18s ease' }} />
         ))}
 
-        <div style={wv.bars}>
-          {bars.map((b, i) => (
-            <div key={i} style={{
-              flex: '1 1 0', minWidth: '1px',
-              height: `${b.amp * 100}%`,
-              background: b.seg >= 0 ? 'rgba(240,234,214,0.18)' : 'var(--text-1)',
-              opacity: b.seg >= 0 ? 1 : 0.82,
-            }} />
+        <div style={{ position: 'absolute', inset: '28px 24px', display: 'flex', alignItems: 'center', gap: 'var(--wave-gap)', zIndex: 1 }}>
+          {bars.map((amp, i) => (
+            <div key={i} style={{ flex: '1 1 0', minWidth: '1px', height: `${amp * 100}%`, background: 'var(--text-1)', opacity: 0.82 }} />
           ))}
         </div>
 
-        <div style={{ ...wv.playhead, left: `${playhead * 100}%` }}>
-          <div style={wv.playKnob} />
+        <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${playhead * 100}%`, width: '1px', background: 'var(--gold-hi)', zIndex: 4, boxShadow: '0 0 8px rgba(212,168,50,0.6)', pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: '7px', height: '7px', background: 'var(--gold-hi)' }} />
         </div>
       </div>
 
-      <div style={wv.ruler}>
-        {ticks.map((t) => (
-          <div key={t} style={{ position: 'absolute', left: `${(t / TOTAL_SEC) * 100}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+      <div style={{ position: 'relative', height: '34px', margin: '0 24px', borderTop: '1px solid #1c1a14' }}>
+        {ticks.map(t => (
+          <div key={t} style={{ position: 'absolute', left: `${(t / totalSec) * 100}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
             <div style={{ width: '1px', height: '6px', background: '#2c2a20' }} />
-            <span className="mono" style={wv.tickLabel}>{fmt(t)}</span>
+            <span className="mono" style={{ fontSize: '10px', letterSpacing: '0.1em', color: 'var(--text-2)' }}>{fmt(t)}</span>
           </div>
         ))}
       </div>
     </div>
   );
 }
-const wv = {
-  panel: { background: 'var(--surface-1)', border: '1px solid #211f18', padding: '0' },
-  head: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px 14px', borderBottom: '1px solid #1c1a14' },
-  headLabel: { fontSize: '11px', letterSpacing: '0.28em', color: 'var(--text-2)' },
-  headMeta: { fontSize: '13px', letterSpacing: '0.08em' },
-  canvas: { position: 'relative', height: '240px', margin: '0', padding: '28px 24px', cursor: 'crosshair', overflow: 'hidden' },
-  bars: { position: 'absolute', inset: '28px 24px', display: 'flex', alignItems: 'center', gap: 'var(--wave-gap)', zIndex: 1 },
-  playhead: { position: 'absolute', top: 0, bottom: 0, width: '1px', background: 'var(--gold-hi)', zIndex: 4, boxShadow: '0 0 8px rgba(212,168,50,0.6)', pointerEvents: 'none' },
-  playKnob: { position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: '7px', height: '7px', background: 'var(--gold-hi)' },
-  ruler: { position: 'relative', height: '34px', margin: '0 24px', borderTop: '1px solid #1c1a14' },
-  tickLabel: { fontSize: '10px', letterSpacing: '0.1em', color: 'var(--text-2)' },
-};
 
-function SegmentList({ segments, activeSeg, onSeekSeg }) {
+function SegmentList({ segments, totalSec, activeSeg, onSeekSeg }) {
   return (
-    <div style={sl.panel}>
-      <div style={sl.head}>
-        <span className="mono" style={sl.headLabel}>ERKANNTE&nbsp;STILLE</span>
-        <span className="mono" style={sl.count}>{segments.length}</span>
+    <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 22px 14px', borderBottom: '1px solid #1c1a14' }}>
+        <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.26em', color: 'var(--text-2)' }}>ERKANNTE&nbsp;STILLE</span>
+        <span className="mono" style={{ fontSize: '13px', color: 'var(--gold)', letterSpacing: '0.05em' }}>{segments.length}</span>
       </div>
-      <div style={sl.scroll}>
-        {segments.map((s) => {
+      <div style={{ overflowY: 'auto', flex: 1, padding: '6px 0' }}>
+        {segments.length === 0 && (
+          <div className="mono" style={{ padding: '24px 22px', fontSize: '11px', letterSpacing: '0.16em', color: 'var(--text-2)', opacity: 0.6 }}>KEINE STILLE ERKANNT</div>
+        )}
+        {segments.map(s => {
           const active = activeSeg === s.i;
           return (
-            <button key={s.i} onClick={() => onSeekSeg(s.i)} style={{ ...sl.row, ...(active ? sl.rowActive : {}) }}
-              onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#16140f'; }}
-              onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}>
-              <span className="mono" style={{ ...sl.idx, color: active ? 'var(--gold-hi)' : 'var(--text-2)' }}>{s.label}</span>
-              <span className="mono" style={sl.time}>{fmt(s.start)}<span style={{ color: 'var(--text-2)' }}> → </span>{fmt(s.end)}</span>
-              <span className="mono" style={sl.dur}>{(s.dur).toFixed(2)}s</span>
-              <span style={{ ...sl.bar, width: `${Math.min(100, (s.dur / 4) * 100)}%` }} />
+            <button key={s.i} onClick={() => onSeekSeg(s.i)}
+              style={{ position: 'relative', width: '100%', display: 'grid', gridTemplateColumns: '34px 1fr auto', alignItems: 'center', gap: '12px', padding: '13px 22px', background: active ? 'rgba(139,58,42,0.12)' : 'transparent', border: 'none', borderLeft: `2px solid ${active ? 'var(--gold)' : 'transparent'}`, cursor: 'pointer', transition: 'background 0.15s ease', textAlign: 'left' }}
+              onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#16140f'; }}
+              onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}>
+              <span className="mono" style={{ fontSize: '12px', letterSpacing: '0.08em', color: active ? 'var(--gold-hi)' : 'var(--text-2)' }}>{s.label}</span>
+              <span className="mono" style={{ fontSize: '12.5px', color: 'var(--text-1)', letterSpacing: '0.04em' }}>{fmt(s.start)}<span style={{ color: 'var(--text-2)' }}> → </span>{fmt(s.end)}</span>
+              <span className="mono" style={{ fontSize: '12px', color: 'var(--gold)', letterSpacing: '0.04em' }}>{s.dur.toFixed(2)}s</span>
+              <span style={{ position: 'absolute', left: '22px', bottom: '6px', height: '1px', width: `${Math.min(100, (s.dur / 4) * 100)}%`, background: 'rgba(139,58,42,0.7)' }} />
             </button>
           );
         })}
@@ -432,97 +380,74 @@ function SegmentList({ segments, activeSeg, onSeekSeg }) {
     </div>
   );
 }
-const sl = {
-  panel: { background: 'var(--surface-1)', border: '1px solid #211f18', display: 'flex', flexDirection: 'column', height: '100%' },
-  head: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 22px 14px', borderBottom: '1px solid #1c1a14' },
-  headLabel: { fontSize: '11px', letterSpacing: '0.26em', color: 'var(--text-2)' },
-  count: { fontSize: '13px', color: 'var(--gold)', letterSpacing: '0.05em' },
-  scroll: { overflowY: 'auto', flex: 1, padding: '6px 0' },
-  row: {
-    position: 'relative', width: '100%', display: 'grid',
-    gridTemplateColumns: '34px 1fr auto', alignItems: 'center', gap: '12px',
-    padding: '13px 22px', background: 'transparent', border: 'none', borderLeft: '2px solid transparent',
-    cursor: 'pointer', transition: 'background 0.15s ease', textAlign: 'left',
-  },
-  rowActive: { background: 'rgba(139,58,42,0.12)', borderLeft: '2px solid var(--gold)' },
-  idx: { fontSize: '12px', letterSpacing: '0.08em' },
-  time: { fontSize: '12.5px', color: 'var(--text-1)', letterSpacing: '0.04em' },
-  dur: { fontSize: '12px', color: 'var(--gold)', letterSpacing: '0.04em' },
-  bar: { position: 'absolute', left: '22px', bottom: '6px', height: '1px', background: 'rgba(139,58,42,0.7)' },
-};
 
 Object.assign(window, { Waveform, SegmentList });
 </script>
 
-<!-- controls.jsx -->
+<!-- ── Controls Panel ── -->
 <script type="text/babel">
 function Slider({ label, sub, value, min, max, step, unit, onChange }) {
   const pct = ((value - min) / (max - min)) * 100;
   return (
-    <div style={cp.sliderBlock}>
-      <div style={cp.sliderTop}>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '18px' }}>
         <div>
-          <div className="mono" style={cp.sLabel}>{label}</div>
-          <div className="mono" style={cp.sSub}>{sub}</div>
+          <div className="mono" style={{ fontSize: '13px', letterSpacing: '0.06em', color: 'var(--text-1)' }}>{label}</div>
+          <div className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.2em', color: 'var(--text-2)', marginTop: '4px', textTransform: 'uppercase' }}>{sub}</div>
         </div>
-        <div className="mono" style={cp.sValue}>
-          {value}<span style={cp.sUnit}>{unit}</span>
+        <div className="mono" style={{ fontSize: '22px', color: 'var(--gold)', letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>
+          {value}<span style={{ fontSize: '13px', color: 'var(--text-2)', marginLeft: '2px' }}>{unit}</span>
         </div>
       </div>
-      <input
-        type="range" min={min} max={max} step={step} value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
+      <input type="range" min={min} max={max} step={step} value={value}
+        onChange={e => onChange(parseFloat(e.target.value))}
         className="impera-range"
-        style={{ background: `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, #26241c ${pct}%, #26241c 100%)` }}
-      />
-      <div style={cp.sScale}>
-        <span className="mono" style={cp.sScaleTxt}>{min}{unit}</span>
-        <span className="mono" style={cp.sScaleTxt}>{max}{unit}</span>
+        style={{ background: `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, #26241c ${pct}%, #26241c 100%)` }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+        <span className="mono" style={{ fontSize: '10px', letterSpacing: '0.08em', color: 'var(--text-2)', opacity: 0.6 }}>{min}{unit}</span>
+        <span className="mono" style={{ fontSize: '10px', letterSpacing: '0.08em', color: 'var(--text-2)', opacity: 0.6 }}>{max}{unit}</span>
       </div>
     </div>
   );
 }
 
 function ControlsPanel({ threshold, setThreshold, minLen, setMinLen, padding, setPadding,
-                         segments, saved, format, setFormat, status, progress, onCut, onReset }) {
+                         segments, saved, totalSec, format, setFormat, status, progress, onCut, onReset, hasAudio }) {
   const formats = ['WAV', 'MP3', 'FLAC'];
   return (
-    <div style={cp.panel}>
-      <div style={cp.sliders}>
-        <Slider label="Erkennungsschwelle" sub="Threshold" value={threshold}
-          min={-60} max={-20} step={1} unit=" dB" onChange={setThreshold} />
-        <Slider label="Mindestlänge" sub="Min. Dauer" value={minLen}
-          min={100} max={1000} step={10} unit=" ms" onChange={setMinLen} />
-        <Slider label="Randabstand" sub="Padding" value={padding}
-          min={0} max={300} step={5} unit=" ms" onChange={setPadding} />
+    <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', padding: '30px 32px 32px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '44px' }}>
+        <Slider label="Erkennungsschwelle" sub="Threshold" value={threshold} min={-60} max={-20} step={1} unit=" dB" onChange={setThreshold} />
+        <Slider label="Mindestlänge" sub="Min. Dauer" value={minLen} min={100} max={1000} step={10} unit=" ms" onChange={setMinLen} />
+        <Slider label="Randabstand" sub="Padding" value={padding} min={0} max={300} step={5} unit=" ms" onChange={setPadding} />
       </div>
 
-      <div style={cp.divider} />
+      <div style={{ height: '1px', background: '#1c1a14', margin: '30px 0 24px' }} />
 
-      <div style={cp.statsRow}>
-        <div style={cp.stat}>
-          <span className="mono" style={cp.statBig}>{segments.length}</span>
-          <span className="mono" style={cp.statLbl}>Stellen erkannt</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '26px', marginBottom: '28px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <span className="mono" style={{ fontSize: '24px', color: 'var(--gold)', letterSpacing: '0.02em', lineHeight: 1 }}>{segments.length}</span>
+          <span className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-2)', textTransform: 'uppercase' }}>Stellen erkannt</span>
         </div>
-        <div style={cp.statSep} />
-        <div style={cp.stat}>
-          <span className="mono" style={cp.statBig}>{fmt(saved)}</span>
-          <span className="mono" style={cp.statLbl}>gespart</span>
+        <div style={{ width: '1px', height: '34px', background: '#222019' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <span className="mono" style={{ fontSize: '24px', color: 'var(--gold)', letterSpacing: '0.02em', lineHeight: 1 }}>{fmt(saved)}</span>
+          <span className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-2)', textTransform: 'uppercase' }}>gespart</span>
         </div>
-        <div style={cp.statSep} />
-        <div style={cp.stat}>
-          <span className="mono" style={cp.statBig}>{fmt(TOTAL_SEC - saved)}</span>
-          <span className="mono" style={cp.statLbl}>Endlänge</span>
+        <div style={{ width: '1px', height: '34px', background: '#222019' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <span className="mono" style={{ fontSize: '24px', color: 'var(--gold)', letterSpacing: '0.02em', lineHeight: 1 }}>{fmt(Math.max(0, totalSec - saved))}</span>
+          <span className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-2)', textTransform: 'uppercase' }}>Endlänge</span>
         </div>
 
         <div style={{ flex: 1 }} />
 
-        <div style={cp.fmtWrap}>
-          <span className="mono" style={cp.fmtLabel}>FORMAT</span>
-          <div style={cp.fmtSeg}>
-            {formats.map((f) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <span className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.22em', color: 'var(--text-2)' }}>FORMAT</span>
+          <div style={{ display: 'flex', border: '1px solid #2a2820' }}>
+            {formats.map(f => (
               <button key={f} onClick={() => setFormat(f)} className="mono"
-                style={{ ...cp.fmtBtn, ...(format === f ? cp.fmtBtnActive : {}) }}>
+                style={{ background: format === f ? 'rgba(184,149,42,0.14)' : 'transparent', border: 'none', color: format === f ? 'var(--gold-hi)' : 'var(--text-2)', fontSize: '12px', letterSpacing: '0.12em', padding: '9px 15px', cursor: 'pointer', transition: 'all 0.18s ease', borderRight: '1px solid #2a2820' }}>
                 {f}
               </button>
             ))}
@@ -531,185 +456,320 @@ function ControlsPanel({ threshold, setThreshold, minLen, setMinLen, padding, se
       </div>
 
       {status === 'idle' && (
-        <button className="mono caps" style={cp.cta} onClick={onCut}
-          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--gold-hi)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--gold)'; }}>
-          Schneiden&nbsp;&amp;&nbsp;Exportieren
-        </button>
+        <StarButton fullWidth onClick={onCut} disabled={!hasAudio}>
+          Schneiden &amp; Exportieren
+        </StarButton>
       )}
 
       {status === 'cutting' && (
-        <div style={cp.progWrap}>
-          <div style={cp.progTop}>
-            <span className="mono" style={cp.progLabel}>VERARBEITUNG · {format}</span>
-            <span className="mono" style={cp.progPct}>{Math.round(progress)}%</span>
+        <div style={{ padding: '4px 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.24em', color: 'var(--text-2)' }}>VERARBEITUNG · {format}</span>
+            <span className="mono" style={{ fontSize: '12px', letterSpacing: '0.06em', color: 'var(--gold)' }}>{Math.round(progress)}%</span>
           </div>
-          <div style={cp.progTrack}>
-            <div style={{ ...cp.progFill, width: `${progress}%` }} />
+          <div style={{ height: '3px', background: '#26241c', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${progress}%`, background: 'var(--gold-hi)', transition: 'width 0.18s linear', boxShadow: '0 0 8px rgba(212,168,50,0.6)' }} />
           </div>
         </div>
       )}
 
       {status === 'done' && (
-        <div style={cp.doneWrap}>
-          <div style={cp.doneLeft}>
-            <div style={cp.doneTri} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', border: '1px solid rgba(184,149,42,0.4)', background: 'rgba(184,149,42,0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '14px solid var(--gold)' }} />
             <div>
-              <div className="mono" style={cp.doneTitle}>EXPORT ABGESCHLOSSEN</div>
-              <div className="mono" style={cp.doneSub}>impera_clean.{format.toLowerCase()} · {fmt(TOTAL_SEC - saved)} · {segments.length} Schnitte</div>
+              <div className="mono" style={{ fontSize: '12px', letterSpacing: '0.2em', color: 'var(--text-1)' }}>EXPORT ABGESCHLOSSEN</div>
+              <div className="mono" style={{ fontSize: '11.5px', letterSpacing: '0.05em', color: 'var(--text-2)', marginTop: '5px' }}>impera_clean.{format.toLowerCase()} · {fmt(Math.max(0, totalSec - saved))} · {segments.length} Schnitte</div>
             </div>
           </div>
-          <button className="mono" style={cp.doneBtn} onClick={onReset}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}>
-            ERNEUT&nbsp;SCHNEIDEN
-          </button>
+          <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em', padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+            onClick={onReset}>ERNEUT&nbsp;SCHNEIDEN</button>
         </div>
       )}
     </div>
   );
 }
 
-const cp = {
-  panel: { background: 'var(--surface-1)', border: '1px solid #211f18', padding: '30px 32px 32px' },
-  sliders: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '44px' },
-  sliderBlock: {},
-  sliderTop: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '18px' },
-  sLabel: { fontSize: '13px', letterSpacing: '0.06em', color: 'var(--text-1)' },
-  sSub: { fontSize: '10.5px', letterSpacing: '0.2em', color: 'var(--text-2)', marginTop: '4px', textTransform: 'uppercase' },
-  sValue: { fontSize: '22px', color: 'var(--gold)', letterSpacing: '0.02em', whiteSpace: 'nowrap' },
-  sUnit: { fontSize: '13px', color: 'var(--text-2)', marginLeft: '2px' },
-  sScale: { display: 'flex', justifyContent: 'space-between', marginTop: '10px' },
-  sScaleTxt: { fontSize: '10px', letterSpacing: '0.08em', color: 'var(--text-2)', opacity: 0.6 },
-  divider: { height: '1px', background: '#1c1a14', margin: '30px 0 24px' },
-  statsRow: { display: 'flex', alignItems: 'center', gap: '26px', marginBottom: '28px', flexWrap: 'wrap' },
-  stat: { display: 'flex', flexDirection: 'column', gap: '5px' },
-  statBig: { fontSize: '24px', color: 'var(--gold)', letterSpacing: '0.02em', lineHeight: 1 },
-  statLbl: { fontSize: '10.5px', letterSpacing: '0.16em', color: 'var(--text-2)', textTransform: 'uppercase' },
-  statSep: { width: '1px', height: '34px', background: '#222019' },
-  fmtWrap: { display: 'flex', alignItems: 'center', gap: '14px' },
-  fmtLabel: { fontSize: '10.5px', letterSpacing: '0.22em', color: 'var(--text-2)' },
-  fmtSeg: { display: 'flex', border: '1px solid #2a2820' },
-  fmtBtn: { background: 'transparent', border: 'none', color: 'var(--text-2)', fontSize: '12px', letterSpacing: '0.12em', padding: '9px 15px', cursor: 'pointer', transition: 'all 0.18s ease', borderRight: '1px solid #2a2820' },
-  fmtBtnActive: { background: 'rgba(184,149,42,0.14)', color: 'var(--gold-hi)' },
-  cta: {
-    width: '100%', padding: '20px', background: 'var(--gold)', color: '#0d0d0b',
-    border: 'none', fontSize: '15px', letterSpacing: '0.32em', fontWeight: 500,
-    cursor: 'pointer', transition: 'background 0.2s ease',
-  },
-  progWrap: { padding: '4px 0' },
-  progTop: { display: 'flex', justifyContent: 'space-between', marginBottom: '12px' },
-  progLabel: { fontSize: '11px', letterSpacing: '0.24em', color: 'var(--text-2)' },
-  progPct: { fontSize: '12px', letterSpacing: '0.06em', color: 'var(--gold)' },
-  progTrack: { height: '3px', background: '#26241c', overflow: 'hidden' },
-  progFill: { height: '100%', background: 'var(--gold-hi)', transition: 'width 0.18s linear', boxShadow: '0 0 8px rgba(212,168,50,0.6)' },
-  doneWrap: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', border: '1px solid rgba(184,149,42,0.4)', background: 'rgba(184,149,42,0.06)' },
-  doneLeft: { display: 'flex', alignItems: 'center', gap: '16px' },
-  doneTri: { width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '14px solid var(--gold)' },
-  doneTitle: { fontSize: '12px', letterSpacing: '0.2em', color: 'var(--text-1)' },
-  doneSub: { fontSize: '11.5px', letterSpacing: '0.05em', color: 'var(--text-2)', marginTop: '5px' },
-  doneBtn: { background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em', padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease' },
-};
-
 Object.assign(window, { ControlsPanel });
 </script>
 
-<!-- main.jsx -->
+<!-- ── Konvertierung Section ── -->
 <script type="text/babel">
-const { useState: uS, useEffect: uE, useMemo: uM, useRef: uRf } = React;
+function KonvertierungSection() {
+  const [file, setFile] = useState(null);
+  const [format, setFormat] = useState('MP3');
+  const [quality, setQuality] = useState('high');
+  const [status, setStatus] = useState('idle'); // idle | converting | done | error
+  const [outputPath, setOutputPath] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const formats = ['MP3', 'WAV', 'AAC', 'FLAC'];
+  const qualities = [
+    { id: 'high',   label: 'Hoch',    sub: '320 kbps' },
+    { id: 'medium', label: 'Mittel',  sub: '192 kbps' },
+    { id: 'low',    label: 'Niedrig', sub: '128 kbps' },
+  ];
+
+  async function handleConvert() {
+    if (!file || !window.electronAPI) return;
+    setStatus('converting');
+    setErrorMsg('');
+    try {
+      const ext = format.toLowerCase();
+      const baseName = file.name.replace(/\.[^.]+$/, '');
+      const savePath = await window.electronAPI.showSaveDialog(`${baseName}.${ext}`);
+      if (!savePath) { setStatus('idle'); return; }
+
+      await window.electronAPI.convertAudio(file.path, savePath, format, quality);
+      setOutputPath(savePath);
+      setStatus('done');
+    } catch (err) {
+      setErrorMsg(err.message || 'Konvertierung fehlgeschlagen');
+      setStatus('error');
+    }
+  }
+
+  function reset() { setFile(null); setStatus('idle'); setOutputPath(null); setErrorMsg(''); }
+
+  if (!file) {
+    return (
+      <UploadZone
+        accept=".mp4,.mov,.avi,.mkv,.m4v,.webm,.mp3,.wav,.flac,.m4a,.aac,video/*,audio/*"
+        label="Video oder Audio ablegen"
+        hint="MP4 · MOV · AVI · MKV · MP3 · WAV · FLAC · M4A"
+        onLoad={setFile}
+      />
+    );
+  }
+
+  const fileSizeMb = (file.size / 1024 / 1024).toFixed(1);
+
+  return (
+    <main style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 48px 60px' }}>
+      <FileStrip name={file.name} meta={`· ${fileSizeMb} MB`} onEject={reset} />
+
+      <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', padding: '32px' }}>
+
+        {/* Format selector */}
+        <div style={{ marginBottom: '32px' }}>
+          <div className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.26em', color: 'var(--text-2)', marginBottom: '16px' }}>AUSGABEFORMAT</div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {formats.map(f => (
+              <button key={f} onClick={() => setFormat(f)} className="mono"
+                style={{ flex: 1, padding: '14px 0', background: format === f ? 'rgba(184,149,42,0.12)' : 'transparent', border: `1px solid ${format === f ? 'rgba(184,149,42,0.6)' : '#2a2820'}`, color: format === f ? 'var(--gold-hi)' : 'var(--text-2)', fontSize: '13px', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Quality selector — only for lossy formats */}
+        {(format === 'MP3' || format === 'AAC') && (
+          <div style={{ marginBottom: '32px' }}>
+            <div className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.26em', color: 'var(--text-2)', marginBottom: '16px' }}>QUALITÄT</div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {qualities.map(q => (
+                <button key={q.id} onClick={() => setQuality(q.id)} className="mono"
+                  style={{ flex: 1, padding: '12px 0', background: quality === q.id ? 'rgba(184,149,42,0.12)' : 'transparent', border: `1px solid ${quality === q.id ? 'rgba(184,149,42,0.6)' : '#2a2820'}`, color: quality === q.id ? 'var(--gold-hi)' : 'var(--text-2)', cursor: 'pointer', transition: 'all 0.2s ease', textAlign: 'center' }}>
+                  <div style={{ fontSize: '12px', letterSpacing: '0.14em' }}>{q.label}</div>
+                  <div style={{ fontSize: '10px', letterSpacing: '0.1em', marginTop: '4px', opacity: 0.7 }}>{q.sub}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div style={{ height: '1px', background: '#1c1a14', margin: '0 0 28px' }} />
+
+        {status === 'idle' && (
+          <StarButton fullWidth onClick={handleConvert}>
+            Konvertieren zu {format}
+          </StarButton>
+        )}
+
+        {status === 'converting' && (
+          <div style={{ textAlign: 'center', padding: '18px 0' }}>
+            <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.3em', color: 'var(--gold)', marginBottom: '16px' }}>KONVERTIERE…</div>
+            <div style={{ height: '2px', background: '#26241c', overflow: 'hidden', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: 0, left: '-40%', width: '40%', height: '100%', background: 'linear-gradient(to right, transparent, var(--gold-hi), transparent)', animation: 'sweep 1.4s linear infinite' }} />
+            </div>
+            <style>{`@keyframes sweep { to { left: 100%; } }`}</style>
+          </div>
+        )}
+
+        {status === 'done' && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', border: '1px solid rgba(184,149,42,0.4)', background: 'rgba(184,149,42,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '14px solid var(--gold)' }} />
+              <div>
+                <div className="mono" style={{ fontSize: '12px', letterSpacing: '0.2em', color: 'var(--text-1)' }}>KONVERTIERUNG ABGESCHLOSSEN</div>
+                <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.04em', color: 'var(--text-2)', marginTop: '5px' }}>{outputPath}</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '9px 14px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+                onClick={() => window.electronAPI && window.electronAPI.showItemInFolder(outputPath)}>
+                IM ORDNER ZEIGEN
+              </button>
+              <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '9px 14px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+                onClick={reset}>
+                NEUE DATEI
+              </button>
+            </div>
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div style={{ padding: '14px 18px', border: '1px solid rgba(139,58,42,0.5)', background: 'rgba(139,58,42,0.06)' }}>
+            <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#c0604a', marginBottom: '8px' }}>FEHLER</div>
+            <div className="mono" style={{ fontSize: '11px', color: 'var(--text-2)', letterSpacing: '0.04em', wordBreak: 'break-all' }}>{errorMsg}</div>
+            <button className="mono" style={{ marginTop: '14px', background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '8px 14px', cursor: 'pointer' }} onClick={() => setStatus('idle')}>ERNEUT VERSUCHEN</button>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+Object.assign(window, { KonvertierungSection });
+</script>
+
+<!-- ── App root ── -->
+<script type="text/babel">
+const BAR_COUNT = 210;
 
 function App() {
-  const [fileName, setFileName] = uS(null);
-  const [threshold, setThreshold] = uS(-42);
-  const [minLen, setMinLen] = uS(320);
-  const [padding, setPadding] = uS(80);
-  const [playhead, setPlayhead] = uS(0.0);
-  const [activeSeg, setActiveSeg] = uS(null);
-  const [format, setFormat] = uS('MP3');
-  const [status, setStatus] = uS('idle');
-  const [progress, setProgress] = uS(0);
-  const timer = uRf(null);
+  const [mode, setMode] = useState('silence');
 
-  const segments = uM(() => buildSegments(padding), [padding]);
-  const saved = uM(
-    () => segments.reduce((a, s) => a + Math.max(0, s.dur - (padding / 1000) * 2), 0),
-    [segments, padding]
+  // ── Silence Remover State ──
+  const [audioFile, setAudioFile] = useState(null);       // File object
+  const [audioMeta, setAudioMeta] = useState(null);       // { totalSec, bars, rmsWindows }
+  const [analyzing, setAnalyzing] = useState(false);
+  const [threshold, setThreshold] = useState(-42);
+  const [minLen, setMinLen] = useState(300);
+  const [padding, setPadding] = useState(60);
+  const [playhead, setPlayhead] = useState(0);
+  const [activeSeg, setActiveSeg] = useState(null);
+  const [format, setFormat] = useState('MP3');
+  const [cutStatus, setCutStatus] = useState('idle');
+  const [progress, setProgress] = useState(0);
+  const timer = useRef(null);
+
+  // ── Analyze file on load ──
+  async function handleAudioLoad(file) {
+    setAudioFile(file);
+    setAnalyzing(true);
+    setAudioMeta(null);
+    try {
+      const ab = await file.arrayBuffer();
+      const ctx = new AudioContext();
+      const buffer = await ctx.decodeAudioData(ab);
+      ctx.close();
+      const channelData = buffer.getChannelData(0);
+      const bars = buildBarsFromAudio(channelData, BAR_COUNT);
+      const rmsWindows = computeRmsWindows(channelData, buffer.sampleRate);
+      setAudioMeta({ totalSec: buffer.duration, bars, rmsWindows });
+    } catch (e) {
+      console.error('Audio decode error', e);
+    }
+    setAnalyzing(false);
+  }
+
+  // ── Re-detect silence when params or audio change ──
+  const segments = useMemo(() => {
+    if (!audioMeta) return [];
+    return detectSilence(audioMeta.rmsWindows, audioMeta.totalSec, threshold, minLen, padding);
+  }, [audioMeta, threshold, minLen, padding]);
+
+  const totalSec = audioMeta ? audioMeta.totalSec : 0;
+  const bars = audioMeta ? audioMeta.bars : Array(BAR_COUNT).fill(0.1);
+
+  const saved = useMemo(
+    () => segments.reduce((a, s) => a + s.dur, 0),
+    [segments]
   );
 
   function seekSeg(i) {
     setActiveSeg(i);
     const s = segments[i];
-    setPlayhead((s.start + s.dur / 2) / TOTAL_SEC);
+    if (s && totalSec > 0) setPlayhead((s.start + s.dur / 2) / totalSec);
   }
 
   function cut() {
-    setStatus('cutting');
-    setProgress(0);
+    setCutStatus('cutting'); setProgress(0);
     clearInterval(timer.current);
     timer.current = setInterval(() => {
-      setProgress((p) => {
+      setProgress(p => {
         const next = p + (1.6 + Math.random() * 3.2);
-        if (next >= 100) {
-          clearInterval(timer.current);
-          setTimeout(() => setStatus('done'), 260);
-          return 100;
-        }
+        if (next >= 100) { clearInterval(timer.current); setTimeout(() => setCutStatus('done'), 260); return 100; }
         return next;
       });
     }, 80);
   }
-  function reset() { setStatus('idle'); setProgress(0); }
-  uE(() => () => clearInterval(timer.current), []);
+  function resetCut() { setCutStatus('idle'); setProgress(0); }
+  useEffect(() => () => clearInterval(timer.current), []);
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '70px' }}>
-      <Header />
+      <Header mode={mode} setMode={setMode} />
 
-      {!fileName ? (
-        <UploadZone onLoad={(name) => setFileName(name)} />
-      ) : (
-        <main style={app.main}>
-          <FileStrip name={fileName} onEject={() => { setFileName(null); reset(); }} />
-
-          <Waveform
-            barCount={210}
-            playhead={playhead}
-            setPlayhead={(f) => { setPlayhead(f); setActiveSeg(null); }}
-            segments={segments}
-            activeSeg={activeSeg}
-            onSeekSeg={seekSeg}
+      {mode === 'silence' && (
+        !audioFile ? (
+          <UploadZone
+            accept=".mp3,.wav,.flac,.m4a,audio/*"
+            label="Audio-Datei ablegen"
+            hint="WAV · MP3 · FLAC · M4A — bis 2 GB"
+            onLoad={handleAudioLoad}
           />
+        ) : (
+          <main style={{ maxWidth: '1360px', margin: '0 auto', padding: '40px 48px 0' }}>
+            <FileStrip
+              name={audioFile.name}
+              meta={totalSec > 0 ? `· ${fmt(totalSec)} · Audio` : null}
+              onEject={() => { setAudioFile(null); setAudioMeta(null); resetCut(); setActiveSeg(null); }}
+            />
 
-          <div style={app.row}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <ControlsPanel
-                threshold={threshold} setThreshold={setThreshold}
-                minLen={minLen} setMinLen={setMinLen}
-                padding={padding} setPadding={setPadding}
-                segments={segments} saved={saved}
-                format={format} setFormat={setFormat}
-                status={status} progress={progress}
-                onCut={cut} onReset={reset}
-              />
+            <Waveform
+              bars={bars} totalSec={totalSec || 1}
+              playhead={playhead}
+              setPlayhead={f => { setPlayhead(f); setActiveSeg(null); }}
+              segments={segments} activeSeg={activeSeg}
+              onSeekSeg={seekSeg} analyzing={analyzing}
+            />
+
+            <div style={{ display: 'flex', gap: '20px', marginTop: '20px', alignItems: 'stretch' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <ControlsPanel
+                  threshold={threshold} setThreshold={setThreshold}
+                  minLen={minLen} setMinLen={setMinLen}
+                  padding={padding} setPadding={setPadding}
+                  segments={segments} saved={saved} totalSec={totalSec}
+                  format={format} setFormat={setFormat}
+                  status={cutStatus} progress={progress}
+                  onCut={cut} onReset={resetCut}
+                  hasAudio={!!audioMeta && !analyzing}
+                />
+              </div>
+              <div style={{ width: '360px', flexShrink: 0 }}>
+                <SegmentList segments={segments} totalSec={totalSec} activeSeg={activeSeg} onSeekSeg={seekSeg} />
+              </div>
             </div>
-            <div style={app.aside}>
-              <SegmentList segments={segments} activeSeg={activeSeg} onSeekSeg={seekSeg} />
-            </div>
-          </div>
-        </main>
+          </main>
+        )
       )}
+
+      {mode === 'convert' && <KonvertierungSection />}
     </div>
   );
 }
 
-const app = {
-  main: { maxWidth: '1360px', margin: '0 auto', padding: '40px 48px 0' },
-  row: { display: 'flex', gap: '20px', marginTop: '20px', alignItems: 'stretch' },
-  aside: { width: '360px', flexShrink: 0 },
-};
-
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
-
 </body>
 </html>
