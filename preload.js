@@ -10,11 +10,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   cutAudio: (inputPath, outputPath, keepSegments, format, quality) =>
     ipcRenderer.invoke('cut-audio', inputPath, outputPath, keepSegments, format, quality),
 
+  cutVideo: (inputPath, outputPath, keepSegments) =>
+    ipcRenderer.invoke('cut-video', inputPath, outputPath, keepSegments),
+
   readFileBuffer: (filePath) =>
     ipcRenderer.invoke('read-file-buffer', filePath),
 
-  showSaveDialog: (defaultName) =>
-    ipcRenderer.invoke('show-save-dialog', defaultName),
+  showSaveDialog: (defaultName, isVideo) =>
+    ipcRenderer.invoke('show-save-dialog', defaultName, isVideo),
 
   showItemInFolder: (filePath) =>
     ipcRenderer.invoke('show-item-in-folder', filePath),

@@ -153,15 +153,70 @@ ipcMain.handle('cut-audio', async (event, inputPath, outputPath, keepSegments, f
   })
 })
 
-// ── IPC: Save Dialog ──────────────────────────────────────────────────────────
-ipcMain.handle('show-save-dialog', async (_event, defaultName) => {
-  const result = await dialog.showSaveDialog({
-    defaultPath: defaultName,
-    filters: [
-      { name: 'Audio Files', extensions: ['mp3', 'wav', 'aac', 'flac'] },
-      { name: 'All Files', extensions: ['*'] },
-    ]
+// ── IPC: Cut Video (silence removal) ─────────────────────────────────────────
+ipcMain.handle('cut-video', async (event, inputPath, outputPath, keepSegments) => {
+  if (!keepSegments || keepSegments.length === 0) {
+    throw new Error('Keine Keep-Segmente übergeben')
+  }
+
+  const filterParts = []
+  keepSegments.forEach((s, i) => {
+    const st = s.start.toFixed(6)
+    const en = s.end.toFixed(6)
+    filterParts.push(`[0:v]trim=start=${st}:end=${en},setpts=PTS-STARTPTS[v${i}]`)
+    filterParts.push(`[0:a]atrim=start=${st}:end=${en},asetpts=PTS-STARTPTS[a${i}]`)
   })
+  const n = keepSegments.length
+  const concatInputs = keepSegments.map((_, i) => `[v${i}][a${i}]`).join('')
+  const filterComplex = filterParts.join(';') + `;${concatInputs}concat=n=${n}:v=1:a=1[outv][outa]`
+
+  const totalDur = keepSegments.reduce((a, s) => a + (s.end - s.start), 0)
+
+  const args = [
+    '-i', inputPath,
+    '-filter_complex', filterComplex,
+    '-map', '[outv]', '-map', '[outa]',
+    '-c:v', 'libx264', '-preset', 'fast', '-crf', '18',
+    '-c:a', 'aac', '-b:a', '192k',
+    '-y', outputPath,
+  ]
+
+  return new Promise((resolve, reject) => {
+    const proc = spawn(ffmpegPath, args)
+    let stderr = ''
+    proc.stderr.on('data', d => {
+      const chunk = d.toString()
+      stderr += chunk
+      const tm = chunk.match(/time=(\d+:\d+:\d+(?:\.\d+)?)/)
+      if (tm && totalDur > 0) {
+        const pct = Math.min(99, (parseTime(tm[1]) / totalDur) * 100)
+        event.sender.send('cut-progress', pct)
+      }
+    })
+    proc.on('close', code => {
+      if (code === 0) {
+        event.sender.send('cut-progress', 100)
+        resolve({ success: true, outputPath })
+      } else {
+        reject(new Error(stderr.slice(-800)))
+      }
+    })
+    proc.on('error', err => reject(err))
+  })
+})
+
+// ── IPC: Save Dialog ──────────────────────────────────────────────────────────
+ipcMain.handle('show-save-dialog', async (_event, defaultName, isVideo) => {
+  const filters = isVideo
+    ? [
+        { name: 'Video Files', extensions: ['mp4'] },
+        { name: 'All Files', extensions: ['*'] },
+      ]
+    : [
+        { name: 'Audio Files', extensions: ['mp3', 'wav', 'aac', 'flac'] },
+        { name: 'All Files', extensions: ['*'] },
+      ]
+  const result = await dialog.showSaveDialog({ defaultPath: defaultName, filters })
   return result.canceled ? null : result.filePath
 })
 

@@ -286,7 +286,7 @@ Object.assign(window, { Header, UploadZone, FileStrip });
 
 <!-- ── Waveform + SegmentList ── -->
 <script type="text/babel">
-function Waveform({ bars, totalSec, playhead, setPlayhead, segments, activeSeg, onSeekSeg, analyzing }) {
+function Waveform({ bars, totalSec, playhead, setPlayhead, segments, activeSeg, onSeekSeg, analyzing, onSegmentEdit }) {
   const ref = useRef(null);
 
   function handleDrag(e) {
@@ -298,6 +298,38 @@ function Waveform({ bars, totalSec, playhead, setPlayhead, segments, activeSeg, 
     setPlayhead(getScrub(e.clientX));
     const onMove = (ev) => setPlayhead(getScrub(ev.clientX));
     const onUp   = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+
+  function startSegDrag(e, s, dragType) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!onSegmentEdit) return;
+    const r = ref.current.getBoundingClientRect();
+    const startX = e.clientX;
+    const startT = Math.max(0, Math.min(1, (startX - r.left) / r.width)) * totalSec;
+    const offset = startT - s.start;
+    const segWidth = s.end - s.start;
+    let moved = false;
+
+    const onMove = (ev) => {
+      const t = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)) * totalSec;
+      if (Math.abs(ev.clientX - startX) > 3) moved = true;
+      if (dragType === 'left') {
+        onSegmentEdit(s.i, Math.max(0, Math.min(t, s.end - 0.05)), s.end);
+      } else if (dragType === 'right') {
+        onSegmentEdit(s.i, s.start, Math.min(totalSec, Math.max(t, s.start + 0.05)));
+      } else {
+        const ns = Math.max(0, Math.min(totalSec - segWidth, t - offset));
+        onSegmentEdit(s.i, ns, ns + segWidth);
+      }
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      if (!moved) onSeekSeg(s.i);
+    };
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   }
@@ -326,8 +358,14 @@ function Waveform({ bars, totalSec, playhead, setPlayhead, segments, activeSeg, 
         )}
 
         {segments.map(s => (
-          <div key={s.i} onClick={e => { e.stopPropagation(); onSeekSeg(s.i); }}
-            style={{ position: 'absolute', top: 0, bottom: 0, left: `${(s.start / totalSec) * 100}%`, width: `${(s.dur / totalSec) * 100}%`, background: activeSeg === s.i ? 'rgba(139,58,42,0.42)' : 'rgba(139,58,42,0.24)', borderLeft: '1px solid rgba(184,149,42,0.6)', borderRight: '1px solid rgba(184,149,42,0.6)', cursor: 'pointer', zIndex: 2, transition: 'background 0.18s ease' }} />
+          <div key={s.i}
+            onMouseDown={e => startSegDrag(e, s, 'body')}
+            style={{ position: 'absolute', top: 0, bottom: 0, left: `${(s.start / totalSec) * 100}%`, width: `${(s.dur / totalSec) * 100}%`, background: activeSeg === s.i ? 'rgba(139,58,42,0.42)' : 'rgba(139,58,42,0.24)', borderLeft: '2px solid rgba(184,149,42,0.7)', borderRight: '2px solid rgba(184,149,42,0.7)', cursor: 'move', zIndex: 2, userSelect: 'none' }}>
+            <div onMouseDown={e => startSegDrag(e, s, 'left')}
+              style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '10px', cursor: 'ew-resize', background: 'rgba(212,168,50,0.22)', zIndex: 4 }} />
+            <div onMouseDown={e => startSegDrag(e, s, 'right')}
+              style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '10px', cursor: 'ew-resize', background: 'rgba(212,168,50,0.22)', zIndex: 4 }} />
+          </div>
         ))}
 
         <div style={{ position: 'absolute', inset: '28px 24px', display: 'flex', alignItems: 'center', gap: 'var(--wave-gap)', zIndex: 1 }}>
@@ -584,8 +622,8 @@ function Slider({ label, sub, value, min, max, step, unit, onChange }) {
 }
 
 function ControlsPanel({ threshold, setThreshold, minLen, setMinLen, padding, setPadding,
-                         segments, saved, totalSec, format, setFormat, status, progress, onCut, onReset, hasAudio, outputPath, cutError }) {
-  const formats = ['WAV', 'MP3', 'FLAC'];
+                         segments, saved, totalSec, format, setFormat, status, progress, onCut, onReset, hasAudio, outputPath, cutError, isVideo }) {
+  const formats = isVideo ? ['MP4', 'MP3', 'WAV'] : ['WAV', 'MP3', 'FLAC'];
   return (
     <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', padding: '30px 32px 32px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '44px' }}>
@@ -1123,6 +1161,7 @@ function App() {
   const [audioFile, setAudioFile] = useState(null);       // File object
   const [audioMeta, setAudioMeta] = useState(null);       // { totalSec, bars, rmsWindows }
   const [analyzing, setAnalyzing] = useState(false);
+  const [isVideo, setIsVideo] = useState(false);
   const [threshold, setThreshold] = useState(-42);
   const [minLen, setMinLen] = useState(300);
   const [padding, setPadding] = useState(60);
@@ -1138,6 +1177,10 @@ function App() {
 
   // ── Analyze file on load ──
   async function handleAudioLoad(file) {
+    const videoExt = /\.(mp4|mov|avi|mkv|m4v|webm)$/i;
+    const fileIsVideo = videoExt.test(file.name);
+    setIsVideo(fileIsVideo);
+    setFormat(fileIsVideo ? 'MP4' : 'WAV');
     setAudioFile(file);
     setAnalyzing(true);
     setAudioMeta(null);
@@ -1157,10 +1200,23 @@ function App() {
   }
 
   // ── Re-detect silence when params or audio change ──
-  const segments = useMemo(() => {
+  const autoSegments = useMemo(() => {
     if (!audioMeta) return [];
     return detectSilence(audioMeta.rmsWindows, audioMeta.totalSec, threshold, minLen, padding);
   }, [audioMeta, threshold, minLen, padding]);
+
+  const [segmentOverrides, setSegmentOverrides] = useState({});
+  useEffect(() => { setSegmentOverrides({}); }, [autoSegments]);
+
+  const segments = useMemo(() => autoSegments.map((s, i) => {
+    const ov = segmentOverrides[i];
+    if (!ov) return s;
+    return { ...s, start: ov.start, end: ov.end, dur: ov.end - ov.start };
+  }), [autoSegments, segmentOverrides]);
+
+  function onSegmentEdit(i, start, end) {
+    setSegmentOverrides(prev => ({ ...prev, [i]: { start, end } }));
+  }
 
   const totalSec = audioMeta ? audioMeta.totalSec : 0;
   const bars = audioMeta ? audioMeta.bars : Array(BAR_COUNT).fill(0.1);
@@ -1216,11 +1272,16 @@ function App() {
       if (keepSegs.length === 0) throw new Error('Keine hörbaren Segmente nach Silence-Erkennung');
 
       const baseName = audioFile.name.replace(/\.[^.]+$/, '');
-      const savePath = await window.electronAPI.showSaveDialog(`${baseName}_clean.${format.toLowerCase()}`);
+      const ext = isVideo ? 'mp4' : format.toLowerCase();
+      const savePath = await window.electronAPI.showSaveDialog(`${baseName}_clean.${ext}`, isVideo);
       if (!savePath) { setCutStatus('idle'); return; }
 
       window.electronAPI.onProgress('cut-progress', pct => setProgress(pct));
-      await window.electronAPI.cutAudio(inputPath, savePath, keepSegs, format, 'high');
+      if (isVideo) {
+        await window.electronAPI.cutVideo(inputPath, savePath, keepSegs);
+      } else {
+        await window.electronAPI.cutAudio(inputPath, savePath, keepSegs, format, 'high');
+      }
       window.electronAPI.offProgress('cut-progress');
 
       setCutOutputPath(savePath);
@@ -1248,17 +1309,17 @@ function App() {
       {mode === 'silence' && (
         !audioFile ? (
           <UploadZone
-            accept=".mp3,.wav,.flac,.m4a,audio/*"
-            label="Audio-Datei ablegen"
-            hint="WAV · MP3 · FLAC · M4A — bis 2 GB"
+            accept=".mp3,.wav,.flac,.m4a,.mp4,.mov,.avi,.mkv,.m4v,.webm,audio/*,video/*"
+            label="Audio oder Video ablegen"
+            hint="WAV · MP3 · FLAC · M4A · MP4 · MOV — bis 2 GB"
             onLoad={handleAudioLoad}
           />
         ) : (
           <main style={{ maxWidth: '1360px', margin: '0 auto', padding: '40px 48px 0' }}>
             <FileStrip
               name={audioFile.name}
-              meta={totalSec > 0 ? `· ${fmt(totalSec)} · Audio` : null}
-              onEject={() => { setAudioFile(null); setAudioMeta(null); resetCut(); setActiveSeg(null); }}
+              meta={totalSec > 0 ? `· ${fmt(totalSec)} · ${isVideo ? 'Video' : 'Audio'}` : null}
+              onEject={() => { setAudioFile(null); setAudioMeta(null); resetCut(); setActiveSeg(null); setIsVideo(false); }}
             />
 
             <Waveform
@@ -1267,6 +1328,7 @@ function App() {
               setPlayhead={f => { setPlayhead(f); setActiveSeg(null); if (seekRef.current) seekRef.current(f); }}
               segments={segments} activeSeg={activeSeg}
               onSeekSeg={seekSeg} analyzing={analyzing}
+              onSegmentEdit={onSegmentEdit}
             />
 
             <PreviewPlayer
@@ -1289,6 +1351,7 @@ function App() {
                   onCut={cut} onReset={resetCut}
                   hasAudio={!!audioMeta && !analyzing}
                   outputPath={cutOutputPath} cutError={cutError}
+                  isVideo={isVideo}
                 />
               </div>
               <div style={{ width: '360px', flexShrink: 0 }}>
