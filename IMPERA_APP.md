@@ -272,13 +272,39 @@ npm run build      # → dist/*.exe
 
 ## Download
 
-| Datei | Beschreibung |
-|---|---|
-| [Setup.exe](https://github.com/Mika4vondenen/impera-silence-remover/releases/latest) | Installer mit Desktop-Verknüpfung (empfohlen) |
-| [Portable.exe](https://github.com/Mika4vondenen/impera-silence-remover/releases/latest) | Läuft direkt ohne Installation |
+**Neuester Release:** https://github.com/Mika4vondenen/impera-silence-remover/releases/latest
 
-> ⚠️ Windows Defender zeigt eine Warnung weil die App nicht code-signiert ist — "Trotzdem ausführen" klicken.
+| Datei | Platform | Beschreibung |
+|---|---|---|
+| `IMPERA.Silence.Remover.Setup.*.exe` | Windows | Installer — Desktop-Verknüpfung, deinstallierbar (empfohlen) |
+| `IMPERA.Silence.Remover.*.exe` | Windows | Portable — kein Install, einfach doppelklicken |
+| `IMPERA.Silence.Remover-*.dmg` | macOS Intel | Für Macs mit Intel-Prozessor (vor 2020) |
+| `IMPERA.Silence.Remover-*-arm64.dmg` | macOS Apple Silicon | Für Macs mit M1 / M2 / M3 / M4 (ab Ende 2020) |
+
+**Welche Datei nehmen?**
+- Windows → `Setup.exe`
+- Mac → Apfel-Menü → "Über diesen Mac": steht **Apple M…** → `arm64.dmg`, steht **Intel** → normale `.dmg`
+
+> ⚠️ **Windows:** Defender zeigt eine Warnung (App nicht signiert) → "Trotzdem ausführen"
+> ⚠️ **Mac:** Beim ersten Start Rechtsklick → "Öffnen" (Gatekeeper-Bypass)
 
 ---
 
-*Zuletzt aktualisiert: Juni 2026 — Impera Automation Internal — V5 MP4 Cutting + Editierbare Zonen*
+## CI / Build-Automatisierung
+
+Builds laufen automatisch via **GitHub Actions** bei jedem Tag-Push (`v*`):
+
+```
+git tag v1.x.x
+git push origin v1.x.x
+→ GitHub baut Windows (.exe) + Mac (.dmg) und erstellt das Release automatisch
+```
+
+Workflow: `.github/workflows/build.yml`
+- `build-windows` auf `windows-latest` → Setup.exe + Portable.exe
+- `build-mac` auf `macos-latest` → x64.dmg + arm64.dmg
+- `release` Job uploaded alle 4 Dateien ins GitHub Release
+
+---
+
+*Zuletzt aktualisiert: Juni 2026 — Impera Automation Internal — V5 MP4 Cutting + Mac Support*
