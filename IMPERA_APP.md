@@ -30,6 +30,8 @@ ElevenLabs (Voice: Mark) produziert zwischen Sätzen typische Stille-Lücken. Di
 - [x] Konvertierung: MP4 / Audio → MP3 / WAV / AAC / FLAC via FFmpeg
 - [x] Stille-Statistik ("Du sparst X:XX Minuten in diesem Video")
 - [x] Zusammenführen-Tab: mehrere Files zu einer Spur mergen
+- [x] MP4 / Video Silence Remover (Stille aus Videos rausschneiden)
+- [x] Stille-Zonen manuell editierbar (resize + verschieben per Drag)
 - [ ] Batch-Modus (mehrere Files auf einmal silence-removen)
 - [ ] Preset-Speicher pro Kanal (@akteabstieg, FearFiles, etc.)
 
@@ -89,10 +91,12 @@ ElevenLabs (Voice: Mark) produziert zwischen Sätzen typische Stille-Lücken. Di
 │  HEADER — Impera Logo (echt SVG) + Nav: SILENCE | MERGE | KONV. │
 ├─────────────────────────────────────────────────────────────────┤
 │  [SILENCE REMOVER MODE]                                         │
-│  UPLOAD ZONE — Drag & Drop                                      │
+│  UPLOAD ZONE — Drag & Drop (Audio + Video: MP3/WAV/MP4/MOV/…)  │
 │  WAVEFORM VIEWER — Wellenform, rote Stille-Marker               │
+│    → Zonen per Drag resize (Kanten) oder verschieben (Body)     │
 │  PREVIEW PLAYER — ▶/⏸ · Scrubber · Auto-Skip · Netto-Länge     │
 │  CONTROLS — 3 Slider + Stille-Stats + Format/Qualität           │
+│    → Audio: WAV / MP3 / FLAC  |  Video: MP4 / MP3 / WAV        │
 │  EXPORT — Echter FFmpeg-Schnitt → Save Dialog → lokaler Speicher│
 │  SEGMENT LIST — alle Stille-Segmente mit Timestamps             │
 ├─────────────────────────────────────────────────────────────────┤
@@ -130,7 +134,9 @@ ElevenLabs (Voice: Mark) produziert zwischen Sätzen typische Stille-Lücken. Di
 ```
 impera-silence-remover/
 ├── main.js           — Electron Hauptprozess + FFmpeg IPC Handler
-│                       (merge-audio, cut-audio, convert-audio, read-file-buffer, get-file-stats)
+│                       (merge-audio, cut-audio, cut-video, convert-audio,
+│                        read-file-buffer, get-file-stats, show-save-dialog,
+│                        show-item-in-folder)
 ├── preload.js        — contextBridge API
 ├── splash.html       — Startscreen (Three.js GLSL Hügel-Animation, Gold-Grid, Impera Logo)
 ├── app.html          — Das Tool (JSX inline, React 18 + Babel CDN)
@@ -167,13 +173,47 @@ impera-silence-remover/
 | Datei-Anzeige: DD.MM HH:MM · Sprachname (statt Dateiname-Timestamp) | ✅ Fertig |
 | .exe Build via electron-builder | ✅ Fertig |
 | GitHub Repo | ✅ Gepusht |
-| Batch-Modus | ⏳ V4 |
-| Preset-Speicher | ⏳ V4 |
-| Code Signing (.exe ohne Warning) | ⏳ V4 |
+| MP4 / Video Silence Remover (cut-video IPC, H.264 + AAC Output) | ✅ Fertig |
+| Stille-Zonen editierbar — Kanten resize + Zone verschieben per Drag | ✅ Fertig |
+| Segment-Overrides (manuelle Edits bleiben bis Slider-Änderung) | ✅ Fertig |
+| Splash Button — dunkler Backdrop + Blur über Wellen-Animation | ✅ Fertig |
+| GitHub Release v1.5.0 — Setup.exe + Portable.exe | ✅ Fertig |
+| Batch-Modus | ⏳ V6 |
+| Preset-Speicher | ⏳ V6 |
+| Code Signing (.exe ohne Warning) | ⏳ V6 |
 
 ---
 
 ## Session-History
+
+### V5 — MP4 Cutting, editierbare Stille-Zonen, Splash Fix
+
+#### MP4 / Video Silence Remover
+- `main.js`: neuer `cut-video` IPC Handler — FFmpeg `filter_complex` mit `trim+setpts` für Video-Stream + `atrim+asetpts` für Audio-Stream
+- Output: H.264 (`-preset fast -crf 18`) + AAC 192k
+- `show-save-dialog` erkennt `isVideo` → zeigt `.mp4` Filter statt Audio-Formate
+- `preload.js`: `cutVideo` + `showSaveDialog(name, isVideo)` exposed
+- `app.html`: Upload Zone akzeptiert MP4/MOV/AVI/MKV — automatische Video-Erkennung beim Laden
+- Format-Selector: Video → `[MP4, MP3, WAV]` | Audio → `[WAV, MP3, FLAC]`
+
+#### Editierbare Stille-Zonen im Waveform
+- Jede Stille-Zone hat **linken Handle** (ew-resize), **rechten Handle** (ew-resize) und **Body** (move)
+- `startSegDrag(e, s, dragType)` — Mouse-Drag auf document mit `requestAnimationFrame`-freier Update-Rate
+- Klick < 3px Bewegung → `onSeekSeg` wie bisher
+- `segmentOverrides` State in App — Map `{[segIndex]: {start, end}}`
+- `useEffect(() => setSegmentOverrides({}), [autoSegments])` — Reset bei Slider-Änderung
+- Finale `segments` = `autoSegments` mit Overrides gemergt
+
+#### Splash Button Fix
+- `background: rgba(13,13,11,0.78)` + `backdrop-filter: blur(10px)` — Button hebt sich über die GLSL Wellen
+- Text-Farbe auf helleres `#d4a832`, mehr Padding `18px 64px`
+
+#### GitHub Release v1.5.0
+- `npm run build` → `dist/IMPERA Silence Remover Setup 1.0.0.exe` + Portable
+- `preload.js` in `package.json` build files ergänzt (war fehlend)
+- Release: https://github.com/Mika4vondenen/impera-silence-remover/releases/tag/v1.5.0
+
+---
 
 ### V4 — Splash Screen GLSL Animation + File Stats
 
@@ -230,4 +270,15 @@ npm run build      # → dist/*.exe
 
 ---
 
-*Zuletzt aktualisiert: Juni 2026 — Impera Automation Internal — V4 GLSL Splash + File Stats*
+## Download
+
+| Datei | Beschreibung |
+|---|---|
+| [Setup.exe](https://github.com/Mika4vondenen/impera-silence-remover/releases/latest) | Installer mit Desktop-Verknüpfung (empfohlen) |
+| [Portable.exe](https://github.com/Mika4vondenen/impera-silence-remover/releases/latest) | Läuft direkt ohne Installation |
+
+> ⚠️ Windows Defender zeigt eine Warnung weil die App nicht code-signiert ist — "Trotzdem ausführen" klicken.
+
+---
+
+*Zuletzt aktualisiert: Juni 2026 — Impera Automation Internal — V5 MP4 Cutting + Editierbare Zonen*
