@@ -126,18 +126,12 @@ Object.assign(window, { StarButton, StarDots });
 
 <!-- ── Shared helpers ── -->
 <script type="text/babel">
-function LogoMark({ size = 30 }) {
-  const id = useMemo(() => 'h' + Math.random().toString(36).slice(2,7), []);
+function LogoMark({ size = 36 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <defs>
-        <pattern id={id} width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="3.4" stroke="var(--gold)" strokeWidth="0.7"/>
-        </pattern>
-        <clipPath id={id+'c'}><path d="M3 6 L37 6 L20 36 Z"/></clipPath>
-      </defs>
-      <g clipPath={`url(#${id}c)`}><rect x="0" y="0" width="40" height="40" fill={`url(#${id})`} opacity="0.85"/></g>
-      <path d="M3 6 L37 6 L20 36 Z" stroke="var(--gold)" strokeWidth="1.1" fill="none"/>
+    <svg width={size} height={Math.round(size * 691.89514 / 796.38574)} viewBox="0 0 796.38574 691.89514" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ color: 'var(--gold)' }}>
+      <g transform="translate(-20.614271,-21.071169)">
+        <path fill="currentColor" fillRule="evenodd" d="m 420.27966,711.75 c -0.53087,-0.6875 -3.34191,-5.4125 -6.24674,-10.5 -2.90483,-5.0875 -5.65109,-9.25 -6.10279,-9.25 -0.76601,0 -3.01048,-3.9022 -18.29078,-31.79999 C 386.41599,654.315 302.09397,509.6054 202.25708,338.6231 102.4202,167.64081 20.682496,27.015806 20.617739,26.123101 20.51587,24.718778 22.589246,24.402983 36,23.780239 44.525,23.38437 63.2,23.276053 77.5,23.539533 91.8,23.803014 235.125,23.345266 396,22.522315 739.74475,20.763901 817,20.653524 817,21.92082 c 0,0.506451 -2.50688,5.262804 -5.57084,10.569675 -3.06396,5.30687 -5.74626,10.559793 -5.96068,11.673163 -0.21441,1.11337 -3.03615,6.369517 -6.27051,11.680326 C 795.9636,61.154793 793.07771,66.175 792.78489,67 c -0.29282,0.825 -3.17671,5.600017 -6.40865,10.611149 C 783.14431,82.62228 700.175,227.61942 602,399.82701 503.825,572.03461 422.9926,712.94709 422.37244,712.96586 c -0.62015,0.0188 -1.5619,-0.52836 -2.09278,-1.21586 z M 569.78384,449.5 c 79.9914,-140.25 146.59387,-257.025 148.0055,-259.5 1.41162,-2.475 2.23943,-4.21543 1.83957,-3.86762 -0.39986,0.34782 -70.00564,113.69182 -154.67952,251.87556 l -153.9525,251.24318 3.18333,5.62444 c 1.75084,3.09344 4.27934,7.38665 5.6189,9.54045 2.23414,3.59215 2.52283,3.75756 3.49069,2 C 423.87013,705.36221 489.79244,589.75 569.78384,449.5 Z M 563.51215,435 c 84.04639,-137.225 153.49633,-250.625 154.33318,-252 0.83686,-1.375 1.04104,-2.05 0.45374,-1.5 C 716.44962,183.23197 399,667.11621 399,668.20332 c 0,0.89075 3.56892,7.289 8.73152,15.65358 0.80007,1.2963 1.7954,1.9713 2.21184,1.5 C 410.3598,684.88561 479.46576,572.225 563.51215,435 Z M 548.5,434.84297 C 712.0827,185.6268 715.90948,179.77203 713.76226,182 c -2.01253,2.08822 -325.7548,462.81698 -326.41076,464.52638 -0.49389,1.28706 8.5368,18.51992 9.6485,18.41179 0.275,-0.0267 68.45,-103.56958 151.5,-230.0952 z M 546.56387,415 C 733.59896,148.97456 716.67975,173.1124 714.78973,175 c -0.82606,0.825 -77.42575,102.6711 -170.22154,226.32466 l -168.71961,224.82466 4.25305,8.94956 c 2.33918,4.92226 4.60342,8.82616 5.03165,8.67534 C 385.56151,643.6234 458.20527,540.675 546.56387,415 Z m -2.09761,-17.5 c 92.83697,-123.75 167.89827,-224.1 166.80289,-223 -1.09538,1.1 -61.9895,76.925 -135.32027,168.5 -73.33077,91.575 -150.3932,187.77363 -171.24985,213.77473 l -37.92119,47.27473 1.30096,3.22527 c 2.97602,7.37804 6.98812,15.98616 7.27983,15.61919 C 375.53085,622.67726 451.62929,521.25 544.46626,397.5 Z m -38.88994,30 c 182.12597,-227.34583 206.22887,-257.55348 202.66842,-254 -1.65324,1.65 -80.89989,94.23523 -176.10368,205.74496 l -173.09778,202.74497 3.72157,9.46182 c 2.04686,5.20401 4.01436,9.14377 4.37221,8.75504 C 367.49492,599.81806 429.79258,522.1 505.57632,427.5 Z m 11.00343,-33 C 713.11383,164.28475 711.13088,166.618 705.2511,172.5 702.50214,175.25 622.49335,263 527.4538,367.5 432.41425,472 354.12702,557.63207 353.48219,557.7935 c -0.78712,0.19704 -0.005,3.57232 2.37956,10.2704 l 3.55199,9.9769 2.17711,-2.2704 C 362.78827,574.52168 432.53327,492.95 516.57975,394.5 Z M 710.7509,158.7107 C 703.68459,156.99504 191.48984,45.207679 191.34259,45.348966 191.1858,45.499413 352.12428,550.27552 353.3349,553.43036 c 0.47159,1.22893 47.21015,-49.51588 180.65154,-196.13626 L 714.00179,159.5 Z M 279.67229,293.40393 C 241.82487,160.5261 211.10408,51.56259 211.40386,51.26281 212.22234,50.444325 699.07355,173.27935 698.75839,174.22483 698.38454,175.34639 349.77083,535 349.05755,535 348.74308,535 317.51971,426.28177 279.67229,293.40393 Z m 243.38044,60.02149 C 618.27502,255.2094 696.03023,174.73213 695.84208,174.58705 695.26136,174.13925 213.64995,53.013925 213.44621,53.264433 c -0.22652,0.278514 135.9563,478.721787 136.26443,478.729977 0.11585,0.003 78.11979,-80.35297 173.34209,-178.56899 z M 345.53627,510.85459 C 344.45574,507.81308 233,62.522863 233,61.247432 c 0,-0.849591 0.67434,-1.180037 1.75,-0.857548 0.9625,0.288562 101.2,28.923093 222.75,63.632296 121.55,34.70919 221.34758,63.4485 221.77239,63.86511 0.42481,0.41662 -69.10019,68.48052 -154.5,151.25312 C 330.71859,527.22439 346.11248,512.47653 345.53627,510.85459 Z M 591.5,272.05433 c 46.75,-45.29973 85.12085,-82.65622 85.26856,-83.01442 0.33722,-0.81779 -441.1721,-126.856409 -441.53337,-126.045487 -0.22512,0.505345 110.01495,441.100427 111.29574,444.814237 0.26423,0.76618 33.5139,-30.75533 80.21019,-76.04126 C 470.60851,389.22494 544.75,317.35406 591.5,272.05433 Z M 344,487.2689 c 0,-0.40211 -20.31848,-94.00863 -45.15217,-208.01449 -24.8337,-114.00587 -44.8949,-207.540674 -44.58045,-207.855128 0.54608,-0.546077 404.5703,128.105058 405.62662,129.161378 0.28023,0.28023 -1.49378,2.48517 -3.94225,4.89987 C 647.24339,214.04878 345.51493,488 344.76424,488 344.34391,488 344,487.671 344,487.2689 Z M 502.45761,343.07013 C 587.9914,265.2837 657.85251,201.51918 657.70452,201.37119 656.96714,200.63381 256.55842,73.108251 256.17727,73.489394 c -0.32512,0.325121 80.55902,373.850386 88.08625,406.784826 0.60014,2.62582 1.44822,4.65082 1.88463,4.5 0.43641,-0.15082 70.77567,-63.91766 156.30946,-141.70409 z M 344.50619,463.7814 c -1.17054,-3.29554 -70.48096,-380.139964 -70.00423,-380.616697 0.29891,-0.298902 2.67074,0.210201 5.27075,1.131341 174.15565,61.700416 359.53578,127.679116 359.97572,128.119056 0.3217,0.32169 0.3974,0.7416 0.16824,0.93312 -1.66753,1.39362 -258.72283,220.73198 -274.68601,234.38217 -12.35013,10.56066 -20.44715,16.83177 -20.72447,16.05101 z M 491.55744,337.82394 C 571.55085,269.5271 637,213.38641 637,213.06683 637,212.26471 276.91246,84.754202 276.3201,85.346562 275.83604,85.830631 345.22948,462 345.80285,462 c 0.17162,0 65.76119,-55.87923 145.75459,-124.17606 z M 345.48062,436.75 C 345.12757,434.4125 333.25953,356.9 319.10721,264.5 304.9549,172.1 293.67906,96.370711 294.04979,96.212692 295.14227,95.74704 619.0573,222.33646 618.76589,223.11518 618.46846,223.91001 347.26012,441 346.56458,441 c -0.24312,0 -0.7309,-1.9125 -1.08396,-4.25 z M 484.40141,329.5 C 557.23242,271.2 616.52411,223.23967 616.16071,222.9215 614.96541,221.87492 295.87351,97.793156 295.45463,98.212038 295.22962,98.437051 306.73527,175.0384 321.02276,268.43727 335.31024,361.83613 347,438.4589 347,438.7101 c 0,0.77075 1.17894,-0.1663 137.40141,-109.2101 z m -135.40203,87.25 c -3.3e-4,-0.6875 -8.30237,-69.86047 -18.44896,-153.7177 C 320.40383,179.17506 312.2111,110.45557 312.34434,110.32232 312.868,109.79867 596.96015,231.54354 596.7375,232.19619 596.50722,232.87123 350.00151,418 349.33295,418 c -0.18312,0 -0.33323,-0.5625 -0.33357,-1.25 z m 126.08276,-94.33515 c 65.22018,-48.90317 118.70111,-89.35409 118.84653,-89.89093 0.14541,-0.53684 -62.66655,-27.84953 -139.58214,-60.69487 -129.45992,-55.28338 -139.86682,-59.55577 -140.11973,-57.52392 -0.15027,1.20718 7.83723,69.22995 17.75,151.16171 C 341.88956,347.39859 350,414.8395 350,415.33552 c 0,0.49602 1.4625,-0.20237 3.25,-1.55198 1.7875,-1.34961 56.61196,-42.46552 121.83214,-91.36869 z m -121.51455,67.41408 c -1.22818,-9.1885 -23.51441,-263.21544 -23.12639,-263.60346 0.3474,-0.3474 227.82683,104.89195 240.36628,111.20122 l 4.30747,2.16733 -109.30747,76.82253 c -60.11912,42.2524 -109.83708,77.02926 -110.48437,77.28193 -0.74587,0.29114 -1.38881,-1.12603 -1.75552,-3.86955 z m 179.85052,-122.16426 39.91812,-28.02674 -2.91812,-1.35192 C 568.81315,237.54245 514.4,212.25542 449.5,182.09262 384.6,151.92982 331.41384,127.31831 331.30854,127.40037 c -0.15422,0.12019 23.40619,264.64665 23.62774,265.28248 0.0567,0.16277 55.93576,-38.97788 178.48183,-125.01818 z M 327.5,545 c -0.85325,-1.65 -1.77636,-3 -2.05136,-3 -0.275,0 0.19811,1.35 1.05136,3 0.85325,1.65 1.77636,3 2.05136,3 0.275,0 -0.19811,-1.35 -1.05136,-3 z M 262.28532,407.25 C 223.37003,329.8375 164.50003,212.725 131.4631,147 L 71.395959,27.5 60.69798,27.216168 C 54.814091,27.060061 50,27.177961 50,27.478168 50,28.300874 332.20678,548 332.65352,548 c 0.21279,0 -31.45291,-63.3375 -70.3682,-140.75 z m 76.83675,138.075 c -1.17884,-2.02721 -1.46351,-1.37835 -0.49853,1.13634 0.34294,0.8937 0.83419,1.41426 1.09166,1.15679 0.25747,-0.25747 -0.009,-1.28938 -0.59313,-2.29313 z M 215.64512,286.93863 95.334158,27.5 84.763188,27.217143 74.192218,26.934286 128.84611,135.73929 C 273.17678,423.07287 335.49119,546.84214 335.71326,546.62008 c 0.13355,-0.13355 -53.89712,-116.9902 -120.06814,-259.68145 z m 26.70057,1.46483 C 187.5213,147.65656 142.5474,32.344533 142.40368,32.154518 c -0.33778,-0.44659 -19.80551,-2.989391 -20.21012,-2.639769 -0.16854,0.145635 49.09865,116.159711 109.48263,257.809061 60.38399,141.64935 109.91532,257.41801 110.06964,257.26369 0.15432,-0.15431 -44.57574,-115.43713 -99.40014,-256.18404 z M 344.12207,541.325 c -1.17884,-2.02721 -1.46351,-1.37835 -0.49853,1.13634 0.34294,0.8937 0.83419,1.41426 1.09166,1.15679 0.25747,-0.25747 -0.009,-1.28938 -0.59313,-2.29313 z M 268.47675,294.24757 C 224.76454,157.22482 189,44.487478 189,43.720139 c 0,-0.977709 -2.87613,-1.908889 -9.61224,-3.112077 -5.28673,-0.944302 -9.80769,-1.521463 -10.04658,-1.282579 -0.23888,0.238884 39.71491,113.885097 88.7862,252.547137 49.07129,138.66204 89.35678,251.97655 89.52332,251.81001 0.16653,-0.16653 -35.46174,-112.41231 -79.17395,-249.43506 z M 320.71923,532.75 C 279.19281,455.9738 48.424517,30.881452 47.386065,29.25 46.048953,27.149341 45.253631,27 35.403623,27 27.105677,27 24.922377,27.285264 25.176676,28.336223 25.602746,30.097069 324.11416,541 324.71692,541 c 0.2555,0 -1.54346,-3.7125 -3.99769,-8.25 z M 228.13691,285.08257 C 168.29715,144.65971 118.69894,29.427026 117.91867,29.00993 116.16465,28.072306 97.915844,27.014957 98.359335,27.876647 98.535789,28.219491 152.15401,143.81061 217.51094,284.7458 282.86787,425.681 336.47555,540.85779 336.63911,540.69423 336.80267,540.53067 287.97668,425.50542 228.13691,285.08257 Z m 26.38923,3.07028 C 205.83676,150.58234 166,37.627016 166,37.141014 c 0,-0.971485 -18.74609,-3.728252 -19.59303,-2.881316 -0.28927,0.289272 43.68216,113.967842 97.71429,252.619042 54.03213,138.65121 98.39566,251.93767 98.58563,251.74771 0.18996,-0.18997 -39.49137,-112.90309 -88.18075,-250.4736 z M 715.12756,170.25 c 1.24387,-1.58606 1.2085,-1.62143 -0.37756,-0.37756 -0.9625,0.75485 -1.75,1.54235 -1.75,1.75 0,0.82304 0.82119,0.29331 2.12756,-1.37244 z M 713.5,168 c 0.99549,-1.1 1.58498,-2 1.30998,-2 -0.275,0 -1.31449,0.9 -2.30998,2 -0.99549,1.1 -1.58498,2 -1.30998,2 0.275,0 1.31449,-0.9 2.30998,-2 z m -0.5,-3.5 c 1.29175,-1.375 2.12363,-2.5 1.84863,-2.5 -0.275,0 -1.55688,1.125 -2.84863,2.5 -1.29175,1.375 -2.12363,2.5 -1.84863,2.5 0.275,0 1.55688,-1.125 2.84863,-2.5 z m 11.89392,-13.95065 C 728.32846,146.39721 730.94801,143 730.71516,143 730.4823,143 614.02872,121.39497 471.92943,94.98882 329.83014,68.582672 213.17529,47.108236 212.69644,47.267853 c -0.47885,0.159616 112.23106,24.975948 250.46646,55.147407 138.23541,30.17145 252.00249,55.20886 252.81574,55.63867 1.93452,1.02242 1.69571,1.22345 8.91528,-7.50458 z m 17.42601,-18.48423 c 3.23684,-4.07917 4.3864,-6.21442 3.5,-6.50108 -2.49596,-0.80717 -531.97927,-81.738038 -532.3485,-81.368804 -0.2032,0.203196 115.37011,21.875722 256.82956,48.16117 C 611.76045,118.64185 729.075,140.49583 731,140.92081 c 3.8813,0.85685 3.17373,1.41039 11.31993,-8.85569 z m 13.61577,-16.30175 c 3.37949,-4.53014 5.78898,-8.35271 5.35442,-8.49459 -1.92513,-0.62852 -551.88817,-67.298014 -553.08722,-67.048221 -0.73775,0.153692 120.52729,19.02022 269.47787,41.925616 148.95057,22.905395 271.10974,41.692895 271.46481,41.749995 0.35507,0.0571 3.41062,-3.60265 6.79012,-8.1328 z m 14.39319,-19.221997 5.6291,-8.458627 -3.22899,-0.530685 C 766.97375,86.606187 210.88576,36.871413 209.86596,37.211347 c -0.7814,0.260468 547.17596,67.301843 553.23393,67.686943 0.95465,0.0607 3.87015,-3.30971 7.229,-8.356917 z M 782.70527,76.25 c 4.14895,-7.08352 4.8079,-8.797976 3.45988,-9.001904 C 782.32368,66.66696 216.32557,33.968271 214.5,34.222013 c -1.77728,0.24703 552.50637,50.393749 560.04012,50.667514 2.79981,0.101741 3.44521,-0.581158 8.16515,-8.639527 z m 12.27879,-21.3944 c 2.63739,-4.59558 4.66789,-8.495117 4.51222,-8.665639 -0.28112,-0.30795 -590.1693,-16.261515 -593.99628,-16.06467 -1.1,0.05658 129.625,7.845928 290.5,17.309662 160.875,9.463735 292.87998,16.884918 293.3444,16.491518 0.46442,-0.393399 3.00227,-4.475291 5.63966,-9.070871 z" />
+      </g>
     </svg>
   );
 }
@@ -230,10 +224,10 @@ function Header({ mode, setMode }) {
         <span className="caps display" style={hz.word}>Impera&nbsp;Automation</span>
       </div>
       <nav style={hz.nav}>
-        {['silence','convert'].map(m => (
+        {['silence','merge','convert'].map(m => (
           <button key={m} className="mono" onClick={() => setMode(m)}
             style={{ ...hz.navBtn, ...(mode === m ? hz.navBtnActive : {}) }}>
-            {m === 'silence' ? 'SILENCE REMOVER' : 'KONVERTIERUNG'}
+            {m === 'silence' ? 'SILENCE REMOVER' : m === 'merge' ? 'ZUSAMMENFÜHREN' : 'KONVERTIERUNG'}
           </button>
         ))}
       </nav>
@@ -295,9 +289,17 @@ Object.assign(window, { Header, UploadZone, FileStrip });
 function Waveform({ bars, totalSec, playhead, setPlayhead, segments, activeSeg, onSeekSeg, analyzing }) {
   const ref = useRef(null);
 
-  function seek(e) {
-    const r = ref.current.getBoundingClientRect();
-    setPlayhead(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)));
+  function handleDrag(e) {
+    e.preventDefault();
+    function getScrub(clientX) {
+      const r = ref.current.getBoundingClientRect();
+      return Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    }
+    setPlayhead(getScrub(e.clientX));
+    const onMove = (ev) => setPlayhead(getScrub(ev.clientX));
+    const onUp   = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
   }
 
   const ticks = [];
@@ -314,7 +316,7 @@ function Waveform({ bars, totalSec, playhead, setPlayhead, segments, activeSeg, 
         </span>
       </div>
 
-      <div ref={ref} onClick={seek}
+      <div ref={ref} onMouseDown={handleDrag}
         style={{ position: 'relative', height: '240px', padding: '28px 24px', cursor: 'crosshair', overflow: 'hidden' }}>
 
         {analyzing && (
@@ -384,6 +386,176 @@ function SegmentList({ segments, totalSec, activeSeg, onSeekSeg }) {
 Object.assign(window, { Waveform, SegmentList });
 </script>
 
+<!-- ── Preview Player ── -->
+<script type="text/babel">
+function PreviewPlayer({ audioFile, segments, totalSec, seekRef, onPlayheadChange }) {
+  const [playing, setPlaying] = useState(false);
+
+  const audioRef    = useRef(null);
+  const rafRef      = useRef(null);
+  const progressRef = useRef(null);
+  const thumbRef    = useRef(null);
+  const timeRef     = useRef(null);
+  const scrubBarRef = useRef(null);
+  const segsRef             = useRef(segments);
+  const durRef              = useRef(totalSec);
+  const lastSkipRef         = useRef(-1);
+  const frameRef            = useRef(0);
+  const onPlayheadChangeRef = useRef(onPlayheadChange);
+
+  useEffect(() => { segsRef.current = segments; lastSkipRef.current = -1; }, [segments]);
+  useEffect(() => { durRef.current = totalSec; }, [totalSec]);
+  useEffect(() => { onPlayheadChangeRef.current = onPlayheadChange; }, [onPlayheadChange]);
+
+  // Blob URL — created once per file, revoked on change
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !audioFile) return;
+    const url = URL.createObjectURL(audioFile);
+    audio.src = url;
+    audio.load();
+    return () => URL.revokeObjectURL(url);
+  }, [audioFile]);
+
+  // Expose seek function to parent via seekRef
+  useEffect(() => {
+    if (!seekRef) return;
+    seekRef.current = (frac) => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      const t = Math.max(0, Math.min(frac * durRef.current, durRef.current));
+      audio.currentTime = t;
+      updateDisplay(t);
+      lastSkipRef.current = -1;
+    };
+  });
+
+  function updateDisplay(t) {
+    const pct = durRef.current > 0 ? (t / durRef.current) * 100 : 0;
+    if (progressRef.current) progressRef.current.style.width = pct + '%';
+    if (thumbRef.current)    thumbRef.current.style.left     = pct + '%';
+    if (timeRef.current)     timeRef.current.textContent     = fmt(t, true);
+  }
+
+  function tick() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const t  = audio.currentTime;
+    const ts = durRef.current;
+    updateDisplay(t);
+
+    // Sync waveform playhead every 4 frames (~15fps) — avoids spamming React re-renders
+    frameRef.current++;
+    if (frameRef.current % 4 === 0 && onPlayheadChangeRef.current && ts > 0) {
+      onPlayheadChangeRef.current(t / ts);
+    }
+
+    // Auto-skip silence
+    for (const s of segsRef.current) {
+      if (t >= s.start && t < s.end) {
+        const target = Math.min(s.end + 0.02, ts - 0.05);
+        if (Math.abs(target - lastSkipRef.current) > 0.1) {
+          lastSkipRef.current = target;
+          audio.currentTime = target;
+        }
+        break;
+      }
+    }
+    rafRef.current = requestAnimationFrame(tick);
+  }
+
+  function togglePlay() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+      cancelAnimationFrame(rafRef.current);
+      setPlaying(false);
+    } else {
+      audio.play().then(() => {
+        rafRef.current = requestAnimationFrame(tick);
+        setPlaying(true);
+      }).catch(() => {});
+    }
+  }
+
+  function seekOnBar(e) {
+    const bar = scrubBarRef.current;
+    if (!bar) return;
+    const r = bar.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    const t = pct * durRef.current;
+    const audio = audioRef.current;
+    if (audio) audio.currentTime = t;
+    updateDisplay(t);
+    lastSkipRef.current = -1;
+  }
+
+  function handleScrubStart(e) {
+    e.preventDefault();
+    seekOnBar(e);
+    const move = (ev) => seekOnBar(ev);
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  }
+
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  const savedSec = segments.reduce((a, s) => a + s.dur, 0);
+  const cleanDur = Math.max(0, totalSec - savedSec);
+
+  if (!audioFile) return null;
+
+  return (
+    <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', marginTop: '20px' }}>
+      <audio ref={audioRef}
+        onEnded={() => { cancelAnimationFrame(rafRef.current); setPlaying(false); }}
+        preload="metadata" style={{ display: 'none' }} />
+      <div style={{ display: 'flex', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #1c1a14', gap: '20px' }}>
+        <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.28em', color: 'var(--text-2)' }}>VORSCHAU</span>
+        <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.1em', color: 'var(--text-2)' }}>
+          Stille übersprungen · <span style={{ color: 'var(--gold)' }}>{fmt(cleanDur)}</span> Netto
+        </span>
+      </div>
+      <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <button onClick={togglePlay}
+          style={{ width: '38px', height: '38px', border: `1px solid ${playing ? 'var(--gold)' : 'rgba(184,149,42,0.4)'}`, background: playing ? 'rgba(184,149,42,0.12)' : 'transparent', color: 'var(--gold)', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s ease' }}>
+          {playing ? '⏸' : '▶'}
+        </button>
+        <span ref={timeRef} className="mono"
+          style={{ fontSize: '11.5px', color: 'var(--text-1)', letterSpacing: '0.04em', minWidth: '64px', fontVariantNumeric: 'tabular-nums' }}>
+          0:00.000
+        </span>
+        <div ref={scrubBarRef} onMouseDown={handleScrubStart}
+          style={{ flex: 1, height: '20px', position: 'relative', cursor: 'pointer' }}>
+          <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', marginTop: '-2px', height: '4px', background: '#26241c', overflow: 'hidden', pointerEvents: 'none' }}>
+            <div ref={progressRef} style={{ height: '100%', width: '0%', background: 'var(--gold)' }} />
+            {segments.map(s => (
+              <div key={s.i} style={{ position: 'absolute', top: 0, bottom: 0,
+                left: `${(s.start / totalSec) * 100}%`,
+                width: `${(s.dur / totalSec) * 100}%`,
+                background: 'rgba(139,58,42,0.45)' }} />
+            ))}
+          </div>
+          <div ref={thumbRef}
+            style={{ position: 'absolute', top: '50%', left: '0%', transform: 'translate(-50%,-50%)', width: '10px', height: '10px', background: 'var(--gold-hi)', pointerEvents: 'none', boxShadow: '0 0 6px rgba(212,168,50,0.55)' }} />
+        </div>
+        <span className="mono"
+          style={{ fontSize: '11.5px', color: 'var(--text-2)', letterSpacing: '0.04em', minWidth: '52px', textAlign: 'right' }}>
+          {fmt(totalSec, true)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { PreviewPlayer });
+</script>
+
 <!-- ── Controls Panel ── -->
 <script type="text/babel">
 function Slider({ label, sub, value, min, max, step, unit, onChange }) {
@@ -412,7 +584,7 @@ function Slider({ label, sub, value, min, max, step, unit, onChange }) {
 }
 
 function ControlsPanel({ threshold, setThreshold, minLen, setMinLen, padding, setPadding,
-                         segments, saved, totalSec, format, setFormat, status, progress, onCut, onReset, hasAudio }) {
+                         segments, saved, totalSec, format, setFormat, status, progress, onCut, onReset, hasAudio, outputPath, cutError }) {
   const formats = ['WAV', 'MP3', 'FLAC'];
   return (
     <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', padding: '30px 32px 32px' }}>
@@ -479,13 +651,29 @@ function ControlsPanel({ threshold, setThreshold, minLen, setMinLen, padding, se
             <div style={{ width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '14px solid var(--gold)' }} />
             <div>
               <div className="mono" style={{ fontSize: '12px', letterSpacing: '0.2em', color: 'var(--text-1)' }}>EXPORT ABGESCHLOSSEN</div>
-              <div className="mono" style={{ fontSize: '11.5px', letterSpacing: '0.05em', color: 'var(--text-2)', marginTop: '5px' }}>impera_clean.{format.toLowerCase()} · {fmt(Math.max(0, totalSec - saved))} · {segments.length} Schnitte</div>
+              <div className="mono" style={{ fontSize: '11.5px', letterSpacing: '0.05em', color: 'var(--text-2)', marginTop: '5px' }}>{outputPath || `impera_clean.${format.toLowerCase()}`} · {fmt(Math.max(0, totalSec - saved))} · {segments.length} Schnitte</div>
             </div>
           </div>
-          <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em', padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
-            onClick={onReset}>ERNEUT&nbsp;SCHNEIDEN</button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {outputPath && window.electronAPI && (
+              <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '9px 14px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+                onClick={() => window.electronAPI.showItemInFolder(outputPath)}>IM ORDNER</button>
+            )}
+            <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.18em', padding: '9px 16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+              onClick={onReset}>ERNEUT&nbsp;SCHNEIDEN</button>
+          </div>
+        </div>
+      )}
+
+      {status === 'error' && (
+        <div style={{ padding: '14px 18px', border: '1px solid rgba(139,58,42,0.5)', background: 'rgba(139,58,42,0.06)' }}>
+          <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#c0604a', marginBottom: '8px' }}>FEHLER BEIM SCHNEIDEN</div>
+          <div className="mono" style={{ fontSize: '11px', color: 'var(--text-2)', letterSpacing: '0.04em', wordBreak: 'break-all' }}>{cutError}</div>
+          <button className="mono" style={{ marginTop: '14px', background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '8px 14px', cursor: 'pointer' }} onClick={onReset}>ERNEUT VERSUCHEN</button>
         </div>
       )}
     </div>
@@ -493,6 +681,270 @@ function ControlsPanel({ threshold, setThreshold, minLen, setMinLen, padding, se
 }
 
 Object.assign(window, { ControlsPanel });
+</script>
+
+<!-- ── Merge Section ── -->
+<script type="text/babel">
+function MergeSection({ onMergeToSilencer }) {
+  const [files, setFiles] = useState([]);
+  const [format, setFormat] = useState('MP3');
+  const [quality, setQuality] = useState('high');
+  const [status, setStatus] = useState('idle'); // idle | merging | done | error
+  const [progress, setProgress] = useState(0);
+  const [outputPath, setOutputPath] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const inputRef = useRef(null);
+
+  const formats = ['MP3', 'WAV', 'FLAC'];
+  const qualities = [
+    { id: 'high',   label: 'Hoch',    sub: '320 kbps' },
+    { id: 'medium', label: 'Mittel',  sub: '192 kbps' },
+    { id: 'low',    label: 'Niedrig', sub: '128 kbps' },
+  ];
+
+  function addFiles(newFiles) {
+    setFiles(prev => [...prev, ...Array.from(newFiles)]);
+  }
+
+  function removeFile(idx) {
+    setFiles(prev => prev.filter((_, i) => i !== idx));
+  }
+
+  function moveFile(idx, dir) {
+    setFiles(prev => {
+      const next = [...prev];
+      const target = idx + dir;
+      if (target < 0 || target >= next.length) return prev;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      return next;
+    });
+  }
+
+  async function doMerge(openInSilencer) {
+    if (!files.length || !window.electronAPI) return;
+    setStatus('merging'); setProgress(0); setErrorMsg('');
+
+    try {
+      const ext = format.toLowerCase();
+      const savePath = openInSilencer
+        ? null
+        : await window.electronAPI.showSaveDialog(`impera_merged.${ext}`);
+      if (!openInSilencer && !savePath) { setStatus('idle'); return; }
+
+      const finalPath = savePath || (await window.electronAPI.showSaveDialog(`impera_merged.${ext}`));
+      if (!finalPath) { setStatus('idle'); return; }
+
+      window.electronAPI.onProgress('merge-progress', pct => setProgress(pct));
+      const inputPaths = files.map(f => f.path);
+      await window.electronAPI.mergeAudio(inputPaths, finalPath, format, quality);
+      window.electronAPI.offProgress('merge-progress');
+
+      setOutputPath(finalPath);
+      setStatus('done');
+
+      if (openInSilencer) {
+        const uint8 = await window.electronAPI.readFileBuffer(finalPath);
+        const mergedFile = new File([uint8], `impera_merged.${ext}`, { type: `audio/${ext}` });
+        mergedFile._diskPath = finalPath;
+        onMergeToSilencer(mergedFile);
+      }
+    } catch (err) {
+      window.electronAPI.offProgress('merge-progress');
+      setErrorMsg(err.message || 'Merge fehlgeschlagen');
+      setStatus('error');
+    }
+  }
+
+  function reset() { setFiles([]); setStatus('idle'); setOutputPath(null); setErrorMsg(''); setProgress(0); }
+
+  const fileSizeTotalMb = (files.reduce((a, f) => a + f.size, 0) / 1024 / 1024).toFixed(1);
+
+  function displayName(name) {
+    const noExt = n => n.replace(/\.[^.]+$/, '');
+    const allNames = files.map(f => noExt(f.name));
+    let prefix = allNames[0] || '';
+    for (const n of allNames) {
+      let i = 0;
+      while (i < prefix.length && i < n.length && prefix[i] === n[i]) i++;
+      prefix = prefix.slice(0, i);
+    }
+    const cleanPrefix = prefix.replace(/[_\-T][^_\-T]*$/, '');
+    let d = noExt(name).slice(cleanPrefix.length);
+    d = d.replace(/_pvc_.*$/, '').replace(/_s\d+_.*$/, '');
+    d = d.replace(/^_?(\d{2})_(\d{2})_(\d{2})/, '$1:$2:$3');
+    return d.replace(/^_/, '') || noExt(name);
+  }
+
+  return (
+    <main style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 48px 60px' }}>
+
+      {/* Upload zone */}
+      <input ref={inputRef} type="file" multiple accept=".mp3,.wav,.flac,.m4a,audio/*" style={{ display: 'none' }}
+        onChange={e => { addFiles(e.target.files); e.target.value = ''; }} />
+
+      {files.length === 0 ? (
+        <div
+          onClick={() => inputRef.current.click()}
+          onDragOver={e => e.preventDefault()}
+          onDrop={e => { e.preventDefault(); addFiles(e.dataTransfer.files); }}
+          style={{ height: '280px', border: '1px dashed var(--gold)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', cursor: 'pointer', transition: 'all 0.25s ease' }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(184,149,42,0.04)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '20px' }}>
+            {[0,1,2].map(i => (
+              <div key={i} style={{ width: '4px', height: `${28 + i * 10}px`, background: 'var(--gold)', opacity: 0.4 + i * 0.2 }} />
+            ))}
+          </div>
+          <div className="display caps" style={{ fontSize: '24px', letterSpacing: '0.32em', color: 'var(--text-1)' }}>Audio-Dateien ablegen</div>
+          <div className="mono" style={{ fontSize: '13px', letterSpacing: '0.18em', color: 'var(--text-2)', marginTop: '4px' }}>oder klicken zum Auswählen — Mehrfachauswahl möglich</div>
+          <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.22em', color: 'var(--text-2)', marginTop: '16px', opacity: 0.7 }}>WAV · MP3 · FLAC · M4A</div>
+        </div>
+      ) : (
+        <>
+          {/* File list header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.28em', color: 'var(--text-2)' }}>
+              {files.length} DATEIEN · {fileSizeTotalMb} MB
+            </span>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {[
+                { label: 'AUTO-SORT', fn: () => setFiles(prev => [...prev].sort((a, b) => a.name.localeCompare(b.name))), color: 'var(--text-2)' },
+                { label: 'LEEREN',    fn: () => setFiles([]),                                                                color: '#c0604a'       },
+                { label: '+ HINZUFÜGEN', fn: () => inputRef.current.click(),                                                color: 'var(--gold)'   },
+              ].map(btn => (
+                <button key={btn.label} className="mono" onClick={btn.fn}
+                  style={{ background: 'transparent', border: '1px solid #2a2820', color: btn.color, fontSize: '11px', letterSpacing: '0.16em', padding: '7px 12px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = btn.color; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a2820'; }}>
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sortable file list */}
+          <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', marginBottom: '24px', maxHeight: '380px', overflowY: 'auto' }}>
+            {files.map((f, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '32px 1fr auto auto', alignItems: 'center', gap: '10px', padding: '8px 14px', borderBottom: i < files.length - 1 ? '1px solid #1a1814' : 'none' }}>
+                <span className="mono" style={{ fontSize: '11px', color: 'var(--gold)', letterSpacing: '0.04em', textAlign: 'center', opacity: 0.7 }}>{String(i + 1).padStart(2, '0')}</span>
+                <span className="mono" style={{ fontSize: '12.5px', color: 'var(--text-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={f.name}>
+                  {displayName(f.name)}
+                </span>
+                <div style={{ display: 'flex', gap: '3px' }}>
+                  <button onClick={() => moveFile(i, -1)} disabled={i === 0}
+                    style={{ background: 'transparent', border: '1px solid #2a2820', color: i === 0 ? '#2a2820' : 'var(--text-2)', width: '24px', height: '24px', cursor: i === 0 ? 'default' : 'pointer', fontSize: '9px', transition: 'all 0.15s ease', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    onMouseEnter={e => { if (i > 0) e.currentTarget.style.color = 'var(--gold)'; }}
+                    onMouseLeave={e => e.currentTarget.style.color = i === 0 ? '#2a2820' : 'var(--text-2)'}>▲</button>
+                  <button onClick={() => moveFile(i, 1)} disabled={i === files.length - 1}
+                    style={{ background: 'transparent', border: '1px solid #2a2820', color: i === files.length - 1 ? '#2a2820' : 'var(--text-2)', width: '24px', height: '24px', cursor: i === files.length - 1 ? 'default' : 'pointer', fontSize: '9px', transition: 'all 0.15s ease', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    onMouseEnter={e => { if (i < files.length - 1) e.currentTarget.style.color = 'var(--gold)'; }}
+                    onMouseLeave={e => e.currentTarget.style.color = i === files.length - 1 ? '#2a2820' : 'var(--text-2)'}>▼</button>
+                </div>
+                <button onClick={() => removeFile(i)}
+                  style={{ background: 'transparent', border: 'none', color: '#2a2820', fontSize: '14px', cursor: 'pointer', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.15s ease' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#c0604a'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#2a2820'}>×</button>
+              </div>
+            ))}
+          </div>
+
+          {/* Format + Quality */}
+          <div style={{ background: 'var(--surface-1)', border: '1px solid #211f18', padding: '24px 28px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <div className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.26em', color: 'var(--text-2)', marginBottom: '12px' }}>AUSGABEFORMAT</div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {formats.map(f => (
+                    <button key={f} onClick={() => setFormat(f)} className="mono"
+                      style={{ flex: 1, padding: '11px 0', background: format === f ? 'rgba(184,149,42,0.12)' : 'transparent', border: `1px solid ${format === f ? 'rgba(184,149,42,0.6)' : '#2a2820'}`, color: format === f ? 'var(--gold-hi)' : 'var(--text-2)', fontSize: '12px', letterSpacing: '0.16em', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {format === 'MP3' && (
+                <div style={{ flex: 1 }}>
+                  <div className="mono" style={{ fontSize: '10.5px', letterSpacing: '0.26em', color: 'var(--text-2)', marginBottom: '12px' }}>QUALITÄT</div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {qualities.map(q => (
+                      <button key={q.id} onClick={() => setQuality(q.id)} className="mono"
+                        style={{ flex: 1, padding: '9px 0', background: quality === q.id ? 'rgba(184,149,42,0.12)' : 'transparent', border: `1px solid ${quality === q.id ? 'rgba(184,149,42,0.6)' : '#2a2820'}`, color: quality === q.id ? 'var(--gold-hi)' : 'var(--text-2)', cursor: 'pointer', transition: 'all 0.2s ease', textAlign: 'center' }}>
+                        <div style={{ fontSize: '11px', letterSpacing: '0.12em' }}>{q.label}</div>
+                        <div style={{ fontSize: '9.5px', letterSpacing: '0.08em', marginTop: '3px', opacity: 0.7 }}>{q.sub}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Actions */}
+          {status === 'idle' && (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <StarButton fullWidth onClick={() => doMerge(true)} disabled={files.length < 2}>
+                  Zusammenführen &amp; Silence Remover
+                </StarButton>
+              </div>
+              <div style={{ flex: 1 }}>
+                <StarButton fullWidth onClick={() => doMerge(false)} disabled={files.length < 2}>
+                  Zusammenführen &amp; Exportieren
+                </StarButton>
+              </div>
+            </div>
+          )}
+
+          {status === 'merging' && (
+            <div style={{ padding: '4px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span className="mono" style={{ fontSize: '11px', letterSpacing: '0.24em', color: 'var(--text-2)' }}>ZUSAMMENFÜHREN · {files.length} DATEIEN</span>
+                <span className="mono" style={{ fontSize: '12px', letterSpacing: '0.06em', color: 'var(--gold)' }}>{Math.round(progress)}%</span>
+              </div>
+              <div style={{ height: '3px', background: '#26241c', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${progress}%`, background: 'var(--gold-hi)', transition: 'width 0.18s linear', boxShadow: '0 0 8px rgba(212,168,50,0.6)' }} />
+              </div>
+            </div>
+          )}
+
+          {status === 'done' && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', border: '1px solid rgba(184,149,42,0.4)', background: 'rgba(184,149,42,0.06)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '14px solid var(--gold)' }} />
+                <div>
+                  <div className="mono" style={{ fontSize: '12px', letterSpacing: '0.2em', color: 'var(--text-1)' }}>MERGE ABGESCHLOSSEN</div>
+                  <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.04em', color: 'var(--text-2)', marginTop: '5px' }}>{outputPath}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                {window.electronAPI && (
+                  <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '9px 14px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+                    onClick={() => window.electronAPI.showItemInFolder(outputPath)}>IM ORDNER</button>
+                )}
+                <button className="mono" style={{ background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '9px 14px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold-hi)'; e.currentTarget.style.borderColor = 'var(--gold)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.borderColor = '#2a2a20'; }}
+                  onClick={reset}>NEUER MERGE</button>
+              </div>
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div style={{ padding: '14px 18px', border: '1px solid rgba(139,58,42,0.5)', background: 'rgba(139,58,42,0.06)' }}>
+              <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#c0604a', marginBottom: '8px' }}>FEHLER</div>
+              <div className="mono" style={{ fontSize: '11px', color: 'var(--text-2)', letterSpacing: '0.04em', wordBreak: 'break-all' }}>{errorMsg}</div>
+              <button className="mono" style={{ marginTop: '14px', background: 'transparent', border: '1px solid #2a2a20', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', padding: '8px 14px', cursor: 'pointer' }} onClick={() => setStatus('idle')}>ERNEUT VERSUCHEN</button>
+            </div>
+          )}
+        </>
+      )}
+    </main>
+  );
+}
+
+Object.assign(window, { MergeSection });
 </script>
 
 <!-- ── Konvertierung Section ── -->
@@ -659,7 +1111,10 @@ function App() {
   const [format, setFormat] = useState('MP3');
   const [cutStatus, setCutStatus] = useState('idle');
   const [progress, setProgress] = useState(0);
-  const timer = useRef(null);
+  const [cutOutputPath, setCutOutputPath] = useState(null);
+  const [cutError, setCutError] = useState('');
+  const timer   = useRef(null);
+  const seekRef = useRef(null);
 
   // ── Analyze file on load ──
   async function handleAudioLoad(file) {
@@ -674,7 +1129,7 @@ function App() {
       const channelData = buffer.getChannelData(0);
       const bars = buildBarsFromAudio(channelData, BAR_COUNT);
       const rmsWindows = computeRmsWindows(channelData, buffer.sampleRate);
-      setAudioMeta({ totalSec: buffer.duration, bars, rmsWindows });
+      setAudioMeta({ totalSec: buffer.duration, bars, rmsWindows, audioBuffer: buffer });
     } catch (e) {
       console.error('Audio decode error', e);
     }
@@ -698,22 +1153,73 @@ function App() {
   function seekSeg(i) {
     setActiveSeg(i);
     const s = segments[i];
-    if (s && totalSec > 0) setPlayhead((s.start + s.dur / 2) / totalSec);
+    if (s && totalSec > 0) {
+      const f = (s.start + s.dur / 2) / totalSec;
+      setPlayhead(f);
+      if (seekRef.current) seekRef.current(f);
+    }
   }
 
-  function cut() {
-    setCutStatus('cutting'); setProgress(0);
-    clearInterval(timer.current);
-    timer.current = setInterval(() => {
-      setProgress(p => {
-        const next = p + (1.6 + Math.random() * 3.2);
-        if (next >= 100) { clearInterval(timer.current); setTimeout(() => setCutStatus('done'), 260); return 100; }
-        return next;
-      });
-    }, 80);
+  function computeKeepSegments(silences, total) {
+    const segs = [];
+    let cursor = 0;
+    for (const s of silences) {
+      if (s.start > cursor + 0.01) segs.push({ start: cursor, end: s.start });
+      cursor = s.end;
+    }
+    if (cursor < total - 0.01) segs.push({ start: cursor, end: total });
+    return segs;
   }
-  function resetCut() { setCutStatus('idle'); setProgress(0); }
+
+  async function cut() {
+    if (!audioFile || !audioMeta) return;
+    setCutStatus('cutting'); setProgress(0); setCutOutputPath(null); setCutError('');
+
+    if (!window.electronAPI) {
+      // Fallback: fake progress if no Electron API
+      clearInterval(timer.current);
+      timer.current = setInterval(() => {
+        setProgress(p => {
+          const next = p + (1.6 + Math.random() * 3.2);
+          if (next >= 100) { clearInterval(timer.current); setTimeout(() => setCutStatus('done'), 260); return 100; }
+          return next;
+        });
+      }, 80);
+      return;
+    }
+
+    try {
+      const inputPath = audioFile._diskPath || audioFile.path;
+      if (!inputPath) throw new Error('Kein Dateipfad — Datei erneut laden');
+
+      const keepSegs = computeKeepSegments(segments, totalSec);
+      if (keepSegs.length === 0) throw new Error('Keine hörbaren Segmente nach Silence-Erkennung');
+
+      const baseName = audioFile.name.replace(/\.[^.]+$/, '');
+      const savePath = await window.electronAPI.showSaveDialog(`${baseName}_clean.${format.toLowerCase()}`);
+      if (!savePath) { setCutStatus('idle'); return; }
+
+      window.electronAPI.onProgress('cut-progress', pct => setProgress(pct));
+      await window.electronAPI.cutAudio(inputPath, savePath, keepSegs, format, 'high');
+      window.electronAPI.offProgress('cut-progress');
+
+      setCutOutputPath(savePath);
+      setCutStatus('done');
+      setProgress(100);
+    } catch (err) {
+      if (window.electronAPI) window.electronAPI.offProgress('cut-progress');
+      setCutError(err.message || 'Unbekannter Fehler');
+      setCutStatus('error');
+    }
+  }
+
+  function resetCut() { setCutStatus('idle'); setProgress(0); setCutOutputPath(null); setCutError(''); }
   useEffect(() => () => clearInterval(timer.current), []);
+
+  async function handleMergeToSilencer(mergedFile) {
+    setMode('silence');
+    await handleAudioLoad(mergedFile);
+  }
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '70px' }}>
@@ -738,9 +1244,17 @@ function App() {
             <Waveform
               bars={bars} totalSec={totalSec || 1}
               playhead={playhead}
-              setPlayhead={f => { setPlayhead(f); setActiveSeg(null); }}
+              setPlayhead={f => { setPlayhead(f); setActiveSeg(null); if (seekRef.current) seekRef.current(f); }}
               segments={segments} activeSeg={activeSeg}
               onSeekSeg={seekSeg} analyzing={analyzing}
+            />
+
+            <PreviewPlayer
+              audioFile={audioFile}
+              segments={segments}
+              totalSec={totalSec}
+              seekRef={seekRef}
+              onPlayheadChange={f => setPlayhead(f)}
             />
 
             <div style={{ display: 'flex', gap: '20px', marginTop: '20px', alignItems: 'stretch' }}>
@@ -754,6 +1268,7 @@ function App() {
                   status={cutStatus} progress={progress}
                   onCut={cut} onReset={resetCut}
                   hasAudio={!!audioMeta && !analyzing}
+                  outputPath={cutOutputPath} cutError={cutError}
                 />
               </div>
               <div style={{ width: '360px', flexShrink: 0 }}>
@@ -763,6 +1278,8 @@ function App() {
           </main>
         )
       )}
+
+      {mode === 'merge' && <MergeSection onMergeToSilencer={handleMergeToSilencer} />}
 
       {mode === 'convert' && <KonvertierungSection />}
     </div>
