@@ -19,6 +19,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showItemInFolder: (filePath) =>
     ipcRenderer.invoke('show-item-in-folder', filePath),
 
+  getFileStats: (filePath) =>
+    ipcRenderer.invoke('get-file-stats', filePath),
+
   onProgress: (channel, cb) =>
     ipcRenderer.on(channel, (_event, pct) => cb(pct)),
 

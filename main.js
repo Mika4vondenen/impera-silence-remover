@@ -170,6 +170,12 @@ ipcMain.handle('read-file-buffer', (_event, filePath) => {
   return fs.readFileSync(filePath)
 })
 
+// ── IPC: File Stats ───────────────────────────────────────────────────────────
+ipcMain.handle('get-file-stats', (_event, filePath) => {
+  const { mtime, birthtime } = fs.statSync(filePath)
+  return { mtime, birthtime }
+})
+
 // ── IPC: Show in Folder ───────────────────────────────────────────────────────
 ipcMain.handle('show-item-in-folder', (_event, filePath) => {
   shell.showItemInFolder(filePath)

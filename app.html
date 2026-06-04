@@ -702,8 +702,19 @@ function MergeSection({ onMergeToSilencer }) {
     { id: 'low',    label: 'Niedrig', sub: '128 kbps' },
   ];
 
-  function addFiles(newFiles) {
-    setFiles(prev => [...prev, ...Array.from(newFiles)]);
+  async function addFiles(newFiles) {
+    const entries = await Promise.all(
+      Array.from(newFiles).map(async f => {
+        if (f.path && window.electronAPI) {
+          try {
+            const stats = await window.electronAPI.getFileStats(f.path);
+            f._mtime = new Date(stats.mtime);
+          } catch (_) {}
+        }
+        return f;
+      })
+    );
+    setFiles(prev => [...prev, ...entries]);
   }
 
   function removeFile(idx) {
@@ -759,7 +770,7 @@ function MergeSection({ onMergeToSilencer }) {
 
   const fileSizeTotalMb = (files.reduce((a, f) => a + f.size, 0) / 1024 / 1024).toFixed(1);
 
-  function displayName(name) {
+  function displayName(file) {
     const noExt = n => n.replace(/\.[^.]+$/, '');
     const allNames = files.map(f => noExt(f.name));
     let prefix = allNames[0] || '';
@@ -769,10 +780,19 @@ function MergeSection({ onMergeToSilencer }) {
       prefix = prefix.slice(0, i);
     }
     const cleanPrefix = prefix.replace(/[_\-T][^_\-T]*$/, '');
-    let d = noExt(name).slice(cleanPrefix.length);
+    let d = noExt(file.name).slice(cleanPrefix.length);
     d = d.replace(/_pvc_.*$/, '').replace(/_s\d+_.*$/, '');
-    d = d.replace(/^_?(\d{2})_(\d{2})_(\d{2})/, '$1:$2:$3');
-    return d.replace(/^_/, '') || noExt(name);
+    d = d.replace(/^_?\d{2}_\d{2}(_\d{2})?_?/, '').replace(/^_/, '').trim() || noExt(file.name);
+
+    if (file._mtime) {
+      const dt = file._mtime;
+      const day = String(dt.getDate()).padStart(2, '0');
+      const mon = String(dt.getMonth() + 1).padStart(2, '0');
+      const h   = String(dt.getHours()).padStart(2, '0');
+      const m   = String(dt.getMinutes()).padStart(2, '0');
+      return `${day}.${mon} ${h}:${m} · ${d}`;
+    }
+    return d;
   }
 
   return (
@@ -808,7 +828,7 @@ function MergeSection({ onMergeToSilencer }) {
             </span>
             <div style={{ display: 'flex', gap: '8px' }}>
               {[
-                { label: 'AUTO-SORT', fn: () => setFiles(prev => [...prev].sort((a, b) => a.name.localeCompare(b.name))), color: 'var(--text-2)' },
+                { label: 'AUTO-SORT', fn: () => setFiles(prev => [...prev].sort((a, b) => (b._mtime || 0) - (a._mtime || 0))), color: 'var(--text-2)' },
                 { label: 'LEEREN',    fn: () => setFiles([]),                                                                color: '#c0604a'       },
                 { label: '+ HINZUFÜGEN', fn: () => inputRef.current.click(),                                                color: 'var(--gold)'   },
               ].map(btn => (
@@ -828,7 +848,7 @@ function MergeSection({ onMergeToSilencer }) {
               <div key={i} style={{ display: 'grid', gridTemplateColumns: '32px 1fr auto auto', alignItems: 'center', gap: '10px', padding: '8px 14px', borderBottom: i < files.length - 1 ? '1px solid #1a1814' : 'none' }}>
                 <span className="mono" style={{ fontSize: '11px', color: 'var(--gold)', letterSpacing: '0.04em', textAlign: 'center', opacity: 0.7 }}>{String(i + 1).padStart(2, '0')}</span>
                 <span className="mono" style={{ fontSize: '12.5px', color: 'var(--text-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={f.name}>
-                  {displayName(f.name)}
+                  {displayName(f)}
                 </span>
                 <div style={{ display: 'flex', gap: '3px' }}>
                   <button onClick={() => moveFile(i, -1)} disabled={i === 0}
