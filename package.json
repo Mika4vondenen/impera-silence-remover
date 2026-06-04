@@ -17,6 +17,9 @@
     "directories": {
       "output": "dist"
     },
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**"
+    ],
     "files": [
       "main.js",
       "preload.js",

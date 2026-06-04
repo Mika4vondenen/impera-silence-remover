@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const os = require('os')
 const { spawn } = require('child_process')
-const ffmpegPath = require('ffmpeg-static')
+const ffmpegPath = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked')
 
 function createWindow() {
   const win = new BrowserWindow({
